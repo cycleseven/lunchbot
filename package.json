@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "serverless-domain-manager": "^2.3.6"
+    "serverless-domain-manager": "^2.3.6",
+    "serverless-python-requirements": "^4.0.0"
   }
 }

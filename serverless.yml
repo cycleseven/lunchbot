@@ -9,6 +9,7 @@ provider:
   runtime: python3.6
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    SLACK_API_TOKEN: ${file(./secrets.yml):SLACK_API_TOKEN}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -23,6 +24,7 @@ provider:
 
 plugins:
   - serverless-domain-manager
+  - serverless-python-requirements
 
 functions:
   hello:
