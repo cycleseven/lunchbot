@@ -27,7 +27,7 @@ plugins:
   - serverless-python-requirements
 
 functions:
-  hello:
+  on_slack_event:
     handler: lunchbot.on_slack_event
     events:
       - http:
