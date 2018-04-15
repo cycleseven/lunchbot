@@ -1,3 +1,4 @@
+import random
 from decimal import Decimal
 
 import boto3
@@ -13,6 +14,68 @@ from slackclient import SlackClient
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 dynamodb = boto3.client("dynamodb")
+
+
+positive_emojis = [
+    "thumbsup",
+    "heart_eyes",
+    "heart_eyes_cat",
+    "grinning_face_with_star_eyes",
+    "ok_hand",
+    "muscle",
+    "100",
+    "sunglasses",
+    "money_mouth_face",
+    "chart",
+    "moneybag",
+    "kissing_heart",
+    "angel",
+    "dancer",
+    "man_dancing",
+    "the_horns",
+    "call_me_hand",
+    "fist",
+    "i_love_you_hand_sign",
+    "raised_hands",
+    "handshake",
+    "clap",
+    "heart",
+    "tada",
+    "sparkles",
+    "medal",
+    "star",
+    "rainbow",
+    "fire",
+    "white_check_mark",
+    "heavy_check_mark",
+]
+
+negative_emojis = [
+    "money_with_wings",
+    "persevere",
+    "sweat",
+    "sob",
+    "scream",
+    "face_with_head_bandage",
+    "skull",
+    "poop",
+    "see_no_evil",
+    "scream_cat",
+    "man-gesturing-no",
+    "woman-gesturing-no",
+    "man-shrugging",
+    "woman-shrugging",
+    "man-facepalming"
+    "woman-facepalming",
+    "facepunch",
+    "third_place_medal",
+    "moyai",
+    "no_entry",
+    "no_entry_sign",
+    "heavy_multiplication_x",
+    "x",
+    "negative_squared_cross_mark",
+]
 
 
 def is_subsequence(short_list, long_list):
@@ -41,10 +104,9 @@ def get_random_emoji(is_positive):
     Pick a random positive or negative emoji based on is_positive flag.
     """
     if is_positive:
-        # Completely randomized choice
-        return "thumbsup"
+        return random.choice(positive_emojis)
     else:
-        return "thumbsdown"
+        return random.choice(negative_emojis)
 
 
 def handle_yes_no_response(message_event, did_bring_lunch):
@@ -56,12 +118,15 @@ def handle_yes_no_response(message_event, did_bring_lunch):
     print(datetime.utcfromtimestamp(float(timestamp)))
 
     emoji = get_random_emoji(did_bring_lunch)
-    sc.api_call(
+    print("adding emoji")
+    print(emoji)
+    slack_response = sc.api_call(
         "reactions.add",
         channel=message_event["channel"],
         name=emoji,
         timestamp=timestamp
     )
+    print(slack_response)
 
     dynamo_response = dynamodb.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],
