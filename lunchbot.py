@@ -1,8 +1,13 @@
+from decimal import Decimal
+
 import boto3
 import json
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
+
+from boto3.dynamodb.conditions import Key
+
 from slackclient import SlackClient
 
 slack_token = os.environ["SLACK_API_TOKEN"]
@@ -61,6 +66,7 @@ def handle_yes_no_response(message_event, did_bring_lunch):
     timestamp = message_event["ts"]
     print("Recorded timestamp")
     print(datetime.utcfromtimestamp(float(timestamp)))
+
     dynamo_response = dynamodb.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],
         Item={
@@ -68,18 +74,59 @@ def handle_yes_no_response(message_event, did_bring_lunch):
                 "S": str(uuid.uuid4())
             },
             "timestamp": {
-                "S": timestamp
+                "N": timestamp
             },
-            "userId": {
+            "user_id": {
                 "S": message_event["user"],
             },
-            "didBringLunch": {
+            "did_bring_lunch": {
                 "BOOL": did_bring_lunch
             },
         }
     )
     print(dynamo_response)
     react_with_emoji(message_event["channel"], message_event["ts"], did_bring_lunch)
+
+
+def invalidate_previous_responses_from_today(message_event):
+    """
+    Query for existing responses and delete them.
+    :param message_event:
+    :return:
+    """
+    now = datetime.utcnow()
+    start_of_today = datetime(now.year, now.month, now.day).timestamp()
+    print("user_id")
+    print(message_event["user"])
+
+    dynamo_resource = boto3.resource("dynamodb")
+    table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
+
+    dynamo_response = table.query(
+        KeyConditionExpression=Key("user_id").eq(message_event["user"]) & Key("timestamp").gte(Decimal(start_of_today))
+    )
+
+    if len(dynamo_response["Items"]) == 0:
+        return
+
+    delete_requests = [
+        {
+            "DeleteRequest": {
+                "Key": {
+                    "user_id": item["user_id"],
+                    "timestamp": item["timestamp"]
+                }
+            }
+        } for item in dynamo_response["Items"]
+    ]
+    print(dynamo_response)
+
+    delete_response = dynamo_resource.batch_write_item(
+        RequestItems={
+            os.environ["DYNAMODB_TABLE"]: delete_requests
+        }
+    )
+    print(delete_response)
 
 
 def detect_yes_no_response(message_event):
@@ -90,9 +137,11 @@ def detect_yes_no_response(message_event):
 
     if "yes" in tokens or is_subsequence(["y", "e", "s"], tokens):
         print("Affirmative response detected using complex deep neural net algorithm.")
+        invalidate_previous_responses_from_today(message_event)
         handle_yes_no_response(message_event, did_bring_lunch=True)
     elif "no" in tokens or is_subsequence(["n", "o"], tokens):
         print("Negative response detected using complex deep neural net algorithm.")
+        invalidate_previous_responses_from_today(message_event)
         handle_yes_no_response(message_event, did_bring_lunch=False)
 
 
