@@ -47,18 +47,6 @@ def get_random_emoji(is_positive):
         return "thumbsdown"
 
 
-def react_with_emoji(channel_id, timestamp, did_bring_lunch):
-    """
-    If did_bring_lunch is true, react with a positive emoji. Otherwise react with a negative emoji (eg. thumbs down).
-    """
-    return sc.api_call(
-        "reactions.add",
-        channel=channel_id,
-        name=get_random_emoji(did_bring_lunch),
-        timestamp=timestamp
-    )
-
-
 def handle_yes_no_response(message_event, did_bring_lunch):
     """
     Store a yes/no boolean response in Dynamo.
@@ -66,6 +54,14 @@ def handle_yes_no_response(message_event, did_bring_lunch):
     timestamp = message_event["ts"]
     print("Recorded timestamp")
     print(datetime.utcfromtimestamp(float(timestamp)))
+
+    emoji = get_random_emoji(did_bring_lunch)
+    sc.api_call(
+        "reactions.add",
+        channel=message_event["channel"],
+        name=emoji,
+        timestamp=timestamp
+    )
 
     dynamo_response = dynamodb.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],
@@ -77,15 +73,20 @@ def handle_yes_no_response(message_event, did_bring_lunch):
                 "N": timestamp
             },
             "user_id": {
-                "S": message_event["user"],
+                "S": message_event["user"]
+            },
+            "channel_id": {
+                "S": message_event["channel"]
             },
             "did_bring_lunch": {
                 "BOOL": did_bring_lunch
             },
+            "emoji": {
+                "S": emoji
+            }
         }
     )
     print(dynamo_response)
-    react_with_emoji(message_event["channel"], message_event["ts"], did_bring_lunch)
 
 
 def invalidate_previous_responses_from_today(message_event):
@@ -103,6 +104,7 @@ def invalidate_previous_responses_from_today(message_event):
     table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
 
     dynamo_response = table.query(
+        ConsistentRead=True,
         KeyConditionExpression=Key("user_id").eq(message_event["user"]) & Key("timestamp").gte(Decimal(start_of_today))
     )
 
@@ -127,6 +129,16 @@ def invalidate_previous_responses_from_today(message_event):
         }
     )
     print(delete_response)
+
+    for item in dynamo_response["Items"]:
+        response = sc.api_call(
+            "reactions.remove",
+            channel=message_event["channel"],
+            name=item["emoji"],
+            timestamp=item["timestamp"]
+        )
+        print("Slack remove emoji response")
+        print(response)
 
 
 def detect_yes_no_response(message_event):
