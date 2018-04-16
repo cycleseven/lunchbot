@@ -82,14 +82,21 @@ def is_subsequence(short_list, long_list):
     """
     Return true if short_list is a subsequence of long_list.
     """
+    print("is_subseq")
+    print(short_list)
+    print(long_list)
+
     if len(short_list) > len(long_list):
         return False
 
     for i, _ in enumerate(long_list):
         looks_good = True
 
-        for j, a_item in enumerate(short_list):
-            if a_item != long_list[i + j]:
+        for j, item_from_short_list in enumerate(short_list):
+            if len(long_list) - j == 0:
+                break
+
+            if item_from_short_list != long_list[i + j]:
                 looks_good = False
                 break
 
@@ -206,17 +213,35 @@ def invalidate_previous_responses_from_today(message_event):
         print(response)
 
 
+def appears_in(word, tokens):
+    """
+    Return true if the word appears in the list of lexical tokens
+    """
+    return word in tokens or is_subsequence(list(word), tokens)
+
+
 def detect_yes_no_response(message_event):
     """
     Detect messages that indicate a "yes" or "no" response from a user.
     """
     tokens = message_event["text"].lower().split()
 
-    if "yes" in tokens or is_subsequence(["y", "e", "s"], tokens):
+    positive_words = [
+        "yes",
+        "aye",
+        "yeah"
+    ]
+
+    negative_words = [
+        "no",
+        "cilia"
+    ]
+
+    if any(appears_in(word, tokens) for word in positive_words):
         print("Affirmative response detected using complex deep neural net algorithm.")
         invalidate_previous_responses_from_today(message_event)
         handle_yes_no_response(message_event, did_bring_lunch=True)
-    elif "no" in tokens or is_subsequence(["n", "o"], tokens):
+    elif any(appears_in(word, tokens) for word in negative_words):
         print("Negative response detected using complex deep neural net algorithm.")
         invalidate_previous_responses_from_today(message_event)
         handle_yes_no_response(message_event, did_bring_lunch=False)
