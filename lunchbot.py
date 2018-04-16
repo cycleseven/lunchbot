@@ -65,7 +65,7 @@ negative_emojis = [
     "woman-gesturing-no",
     "man-shrugging",
     "woman-shrugging",
-    "man-facepalming"
+    "man-facepalming",
     "woman-facepalming",
     "facepunch",
     "third_place_medal",
