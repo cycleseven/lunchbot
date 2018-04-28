@@ -168,14 +168,11 @@ def invalidate_previous_responses_from_today(message_event):
     ]
     print(dynamo_response)
 
-    delete_response = dynamo_resource.batch_write_item(
-        RequestItems={
-            os.environ["DYNAMODB_TABLE"]: delete_requests
-        }
-    )
-    print(delete_response)
-
     for item in dynamo_response["Items"]:
+        print("removing reaction")
+        print("channel", message_event["channel"])
+        print("emoji", item["emoji"])
+        print("timestamp", item["timestamp"])
         response = sc.api_call(
             "reactions.remove",
             channel=message_event["channel"],
@@ -184,6 +181,13 @@ def invalidate_previous_responses_from_today(message_event):
         )
         print("Slack remove emoji response")
         print(response)
+
+    delete_response = dynamo_resource.batch_write_item(
+        RequestItems={
+            os.environ["DYNAMODB_TABLE"]: delete_requests
+        }
+    )
+    print(delete_response)
 
 
 def appears_in(word, tokens):
