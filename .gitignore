@@ -18,6 +18,10 @@ var/
 node_modules/
 venv/
 
+# Caches
+.pytest_cache/
+__pycache__
+
 # Serverless directories
 .serverless
 

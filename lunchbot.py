@@ -1,15 +1,14 @@
 import random
-from decimal import Decimal
-
 import boto3
 import json
 import os
 import uuid
-from datetime import datetime, timedelta
 
+from datetime import datetime
+from decimal import Decimal
 from boto3.dynamodb.conditions import Key
-
 from slackclient import SlackClient
+from utils import is_subsequence
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
@@ -76,34 +75,6 @@ negative_emojis = [
     "x",
     "negative_squared_cross_mark",
 ]
-
-
-def is_subsequence(short_list, long_list):
-    """
-    Return true if short_list is a subsequence of long_list.
-    """
-    print("is_subseq")
-    print(short_list)
-    print(long_list)
-
-    if len(short_list) > len(long_list):
-        return False
-
-    for i, _ in enumerate(long_list):
-        looks_good = True
-
-        for j, item_from_short_list in enumerate(short_list):
-            if len(long_list) - j == 0:
-                break
-
-            if item_from_short_list != long_list[i + j]:
-                looks_good = False
-                break
-
-        if looks_good:
-            return True
-
-    return False
 
 
 def get_random_emoji(is_positive):
