@@ -1,4 +1,6 @@
 import random
+from pprint import pprint
+
 import boto3
 import json
 import os
@@ -222,10 +224,12 @@ def on_slack_event(event, context):
     """
     Lambda handler called when a new event from Slack is POSTed.
     """
+    print("Received event from Slack.")
+    pprint(event)
+
     try:
         body = json.loads(event["body"])
         message_event = body["event"]
-        print(body)
     except KeyError:
         return {
             "statusCode": 400,
