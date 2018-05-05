@@ -117,6 +117,9 @@ def handle_yes_no_response(message_event, did_bring_lunch):
             "timestamp": {
                 "N": timestamp
             },
+            "slack_ts": {
+                "S": timestamp
+            },
             "user_id": {
                 "S": message_event["user"]
             },
@@ -177,7 +180,7 @@ def invalidate_previous_responses_from_today(message_event):
             "reactions.remove",
             channel=message_event["channel"],
             name=item["emoji"],
-            timestamp=item["timestamp"]
+            timestamp=item["slack_ts"]
         )
         print("Slack remove emoji response")
         print(response)
