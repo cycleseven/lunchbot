@@ -1,12 +1,6 @@
 import random
 
-import boto3
-import os
-import uuid
-
-from datetime import datetime
-from decimal import Decimal
-from boto3.dynamodb.conditions import Key
+from lunchbot_records import get_todays_records_for_user, delete_records, store_record
 
 positive_emojis = [
     "thumbsup",
@@ -80,13 +74,7 @@ def get_random_emoji(is_positive):
         return random.choice(negative_emojis)
 
 
-def handle_yes_no_response(lunchbot_message, did_bring_lunch, dynamodb, sc):
-    """
-    Store a yes/no boolean response in Dynamo.
-    """
-    print("Recorded timestamp")
-    print(datetime.utcfromtimestamp(float(lunchbot_message.get_ts())))
-
+def handle_yes_no_response(lunchbot_message, did_bring_lunch, sc):
     emoji = get_random_emoji(did_bring_lunch)
     print("adding emoji")
     print(emoji)
@@ -98,77 +86,31 @@ def handle_yes_no_response(lunchbot_message, did_bring_lunch, dynamodb, sc):
     )
     print(slack_response)
 
-    dynamo_response = dynamodb.put_item(
-        TableName=os.environ["DYNAMODB_TABLE"],
-        Item={
-            "id": {
-                "S": str(uuid.uuid4())
-            },
-            "timestamp": {
-                "N": lunchbot_message.get_ts()
-            },
-            "slack_ts": {
-                "S": lunchbot_message.get_ts()
-            },
-            "user_id": {
-                "S": lunchbot_message.get_user()
-            },
-            "channel_id": {
-                "S": lunchbot_message.get_channel()
-            },
-            "did_bring_lunch": {
-                "BOOL": did_bring_lunch
-            },
-            "emoji": {
-                "S": emoji
-            }
-        }
+    store_record(
+        ts=lunchbot_message.get_ts(),
+        user_id=lunchbot_message.get_user(),
+        channel_id=lunchbot_message.get_channel(),
+        did_bring_lunch=did_bring_lunch,
+        emoji=emoji
     )
-    print(dynamo_response)
 
 
 def invalidate_previous_responses_from_today(sc, lunchbot_message):
     """Query for existing responses and delete them."""
-    now = datetime.utcnow()
-    start_of_today = datetime(now.year, now.month, now.day).timestamp()
+    todays_records_for_user = get_todays_records_for_user(lunchbot_message.get_user())
 
-    # Should move outside no? Resource created on every lambda invocation
-    dynamo_resource = boto3.resource("dynamodb")
-    table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
-
-    dynamo_response = table.query(
-        ConsistentRead=True,
-        KeyConditionExpression=Key("user_id").eq(lunchbot_message.get_user()) & Key("timestamp").gte(Decimal(start_of_today))
-    )
-
-    if len(dynamo_response["Items"]) == 0:
+    if len(todays_records_for_user) == 0:
         return
 
-    delete_requests = [
-        {
-            "DeleteRequest": {
-                "Key": {
-                    "user_id": item["user_id"],
-                    "timestamp": item["timestamp"]
-                }
-            }
-        } for item in dynamo_response["Items"]
-    ]
-    print(dynamo_response)
-
-    for item in dynamo_response["Items"]:
+    # Remove old Slack emoji reactions
+    for record in todays_records_for_user:
         response = sc.api_call(
             "reactions.remove",
             channel=lunchbot_message.get_channel(),
-            name=item["emoji"],
-            timestamp=item["slack_ts"]
+            name=record["emoji"],
+            timestamp=record["slack_ts"]
         )
         print("Slack remove emoji response")
         print(response)
 
-    delete_response = dynamo_resource.batch_write_item(
-        RequestItems={
-            os.environ["DYNAMODB_TABLE"]: delete_requests
-        }
-    )
-    print(delete_response)
+    delete_records(todays_records_for_user)

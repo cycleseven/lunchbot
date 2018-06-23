@@ -2,14 +2,12 @@ import json
 import os
 from pprint import pprint
 
-import boto3
 from lunchbot import invalidate_previous_responses_from_today, handle_yes_no_response
 from lunchbot_message import LunchbotMessage
 from slackclient import SlackClient
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
-dynamodb = boto3.client("dynamodb")
 
 
 def on_slack_event(event, context):
@@ -49,7 +47,7 @@ def on_slack_event(event, context):
         else:
             did_bring_lunch = False
 
-        handle_yes_no_response(lunchbot_message, did_bring_lunch, dynamodb, sc)
+        handle_yes_no_response(lunchbot_message, did_bring_lunch, sc)
 
     return {
         "statusCode": 200,
