@@ -2,10 +2,6 @@ def is_subsequence(short_list, long_list):
     """
     Return true if short_list is a subsequence of long_list.
     """
-    print("is_subseq")
-    print(short_list)
-    print(long_list)
-
     if len(short_list) > len(long_list):
         return False
 

@@ -1,21 +1,13 @@
 import random
-from pprint import pprint
 
 import boto3
-import json
 import os
 import uuid
 
 from datetime import datetime
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key
-from slackclient import SlackClient
 from utils import is_subsequence
-
-slack_token = os.environ["SLACK_API_TOKEN"]
-sc = SlackClient(slack_token)
-dynamodb = boto3.client("dynamodb")
-
 
 positive_emojis = [
     "thumbsup",
@@ -78,6 +70,11 @@ negative_emojis = [
     "negative_squared_cross_mark",
 ]
 
+# Constants representing possible results from an attempt to detect a yes/no response in a message
+YN_YES_RESPONSE = "YN_YES_RESPONSE"
+YN_NO_RESPONSE = "YN_NO_RESPONSE"
+YN_RESPONSE_NOT_FOUND = "YN_RESPONSE_NOT_FOUND"
+
 
 def get_random_emoji(is_positive):
     """
@@ -89,11 +86,18 @@ def get_random_emoji(is_positive):
         return random.choice(negative_emojis)
 
 
-def handle_yes_no_response(message_event, did_bring_lunch):
+def handle_yes_no_response(message_event, did_bring_lunch, dynamodb, sc):
     """
     Store a yes/no boolean response in Dynamo.
     """
-    timestamp = message_event["ts"]
+
+    if "subtype" in message_event:
+        user = message_event["message"]["user"]
+        timestamp = message_event["message"]["ts"]
+    else:
+        user = message_event["user"]
+        timestamp = message_event["ts"]
+
     print("Recorded timestamp")
     print(datetime.utcfromtimestamp(float(timestamp)))
 
@@ -108,6 +112,7 @@ def handle_yes_no_response(message_event, did_bring_lunch):
     )
     print(slack_response)
 
+
     dynamo_response = dynamodb.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],
         Item={
@@ -121,7 +126,7 @@ def handle_yes_no_response(message_event, did_bring_lunch):
                 "S": timestamp
             },
             "user_id": {
-                "S": message_event["user"]
+                "S": user
             },
             "channel_id": {
                 "S": message_event["channel"]
@@ -137,7 +142,7 @@ def handle_yes_no_response(message_event, did_bring_lunch):
     print(dynamo_response)
 
 
-def invalidate_previous_responses_from_today(message_event):
+def invalidate_previous_responses_from_today(sc, message_event):
     """
     Query for existing responses and delete them.
     :param message_event:
@@ -145,15 +150,19 @@ def invalidate_previous_responses_from_today(message_event):
     """
     now = datetime.utcnow()
     start_of_today = datetime(now.year, now.month, now.day).timestamp()
-    print("user_id")
-    print(message_event["user"])
 
+    # Should move outside no? Resource created on every lambda invocation
     dynamo_resource = boto3.resource("dynamodb")
     table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
 
+    if "subtype" in message_event:
+        user = message_event["message"]["user"]
+    else:
+        user = message_event["user"]
+
     dynamo_response = table.query(
         ConsistentRead=True,
-        KeyConditionExpression=Key("user_id").eq(message_event["user"]) & Key("timestamp").gte(Decimal(start_of_today))
+        KeyConditionExpression=Key("user_id").eq(user) & Key("timestamp").gte(Decimal(start_of_today))
     )
 
     if len(dynamo_response["Items"]) == 0:
@@ -172,10 +181,6 @@ def invalidate_previous_responses_from_today(message_event):
     print(dynamo_response)
 
     for item in dynamo_response["Items"]:
-        print("removing reaction")
-        print("channel", message_event["channel"])
-        print("emoji", item["emoji"])
-        print("timestamp", item["timestamp"])
         response = sc.api_call(
             "reactions.remove",
             channel=message_event["channel"],
@@ -204,7 +209,12 @@ def detect_yes_no_response(message_event):
     """
     Detect messages that indicate a "yes" or "no" response from a user.
     """
-    tokens = message_event["text"].lower().split()
+    if "subtype" in message_event and message_event["subtype"] == "message_changed":
+        message_text = message_event["message"]["text"]
+    else:
+        message_text = message_event["text"]
+
+    tokens = message_text.lower().split()
 
     positive_words = [
         "yes",
@@ -219,41 +229,9 @@ def detect_yes_no_response(message_event):
 
     if any(appears_in(word, tokens) for word in positive_words):
         print("Affirmative response detected using complex deep neural net algorithm.")
-        invalidate_previous_responses_from_today(message_event)
-        handle_yes_no_response(message_event, did_bring_lunch=True)
+        return YN_YES_RESPONSE
     elif any(appears_in(word, tokens) for word in negative_words):
         print("Negative response detected using complex deep neural net algorithm.")
-        invalidate_previous_responses_from_today(message_event)
-        handle_yes_no_response(message_event, did_bring_lunch=False)
-
-
-def on_slack_event(event, context):
-    """
-    Lambda handler called when a new event from Slack is POSTed.
-    """
-    print("Received event from Slack.")
-    pprint(event)
-
-    try:
-        body = json.loads(event["body"])
-        message_event = body["event"]
-    except KeyError:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({
-                "message": "Malformed event in request body."
-            })
-        }
-
-    if message_event["type"] != "message":
-        return {
-            "statusCode": 200,
-            "body": "Ignoring non-message event."
-        }
-
-    detect_yes_no_response(message_event)
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps({"message": "Successfully processed Slack event."})
-    }
+        return YN_NO_RESPONSE
+    else:
+        return YN_RESPONSE_NOT_FOUND
