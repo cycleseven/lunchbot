@@ -1,7 +1,5 @@
 def is_subsequence(short_list, long_list):
-    """
-    Return true if short_list is a subsequence of long_list.
-    """
+    """Return true if short_list is a subsequence of long_list."""
     if len(short_list) > len(long_list):
         return False
 
@@ -27,3 +25,7 @@ def is_subsequence(short_list, long_list):
 
     return False
 
+
+def appears_in(word, tokens):
+    """Return true if the word appears in the list of lexical tokens"""
+    return word in tokens or is_subsequence(list(word), tokens)
