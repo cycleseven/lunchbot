@@ -80,21 +80,21 @@ def get_random_emoji(is_positive):
         return random.choice(negative_emojis)
 
 
-def handle_yes_no_response(slack_event, did_bring_lunch, dynamodb, sc):
+def handle_yes_no_response(lunchbot_message, did_bring_lunch, dynamodb, sc):
     """
     Store a yes/no boolean response in Dynamo.
     """
     print("Recorded timestamp")
-    print(datetime.utcfromtimestamp(float(slack_event.get_ts())))
+    print(datetime.utcfromtimestamp(float(lunchbot_message.get_ts())))
 
     emoji = get_random_emoji(did_bring_lunch)
     print("adding emoji")
     print(emoji)
     slack_response = sc.api_call(
         "reactions.add",
-        channel=slack_event.get_channel(),
+        channel=lunchbot_message.get_channel(),
         name=emoji,
-        timestamp=slack_event.get_ts()
+        timestamp=lunchbot_message.get_ts()
     )
     print(slack_response)
 
@@ -105,16 +105,16 @@ def handle_yes_no_response(slack_event, did_bring_lunch, dynamodb, sc):
                 "S": str(uuid.uuid4())
             },
             "timestamp": {
-                "N": slack_event.get_ts()
+                "N": lunchbot_message.get_ts()
             },
             "slack_ts": {
-                "S": slack_event.get_ts()
+                "S": lunchbot_message.get_ts()
             },
             "user_id": {
-                "S": slack_event.get_user()
+                "S": lunchbot_message.get_user()
             },
             "channel_id": {
-                "S": slack_event.get_channel()
+                "S": lunchbot_message.get_channel()
             },
             "did_bring_lunch": {
                 "BOOL": did_bring_lunch
@@ -127,7 +127,7 @@ def handle_yes_no_response(slack_event, did_bring_lunch, dynamodb, sc):
     print(dynamo_response)
 
 
-def invalidate_previous_responses_from_today(sc, slack_event):
+def invalidate_previous_responses_from_today(sc, lunchbot_message):
     """Query for existing responses and delete them."""
     now = datetime.utcnow()
     start_of_today = datetime(now.year, now.month, now.day).timestamp()
@@ -138,7 +138,7 @@ def invalidate_previous_responses_from_today(sc, slack_event):
 
     dynamo_response = table.query(
         ConsistentRead=True,
-        KeyConditionExpression=Key("user_id").eq(slack_event.get_user()) & Key("timestamp").gte(Decimal(start_of_today))
+        KeyConditionExpression=Key("user_id").eq(lunchbot_message.get_user()) & Key("timestamp").gte(Decimal(start_of_today))
     )
 
     if len(dynamo_response["Items"]) == 0:
@@ -159,7 +159,7 @@ def invalidate_previous_responses_from_today(sc, slack_event):
     for item in dynamo_response["Items"]:
         response = sc.api_call(
             "reactions.remove",
-            channel=slack_event.get_channel(),
+            channel=lunchbot_message.get_channel(),
             name=item["emoji"],
             timestamp=item["slack_ts"]
         )

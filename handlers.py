@@ -4,7 +4,7 @@ from pprint import pprint
 
 import boto3
 from lunchbot import invalidate_previous_responses_from_today, handle_yes_no_response
-from slack_event import SlackEvent
+from lunchbot_message import LunchbotMessage
 from slackclient import SlackClient
 
 slack_token = os.environ["SLACK_API_TOKEN"]
@@ -30,25 +30,26 @@ def on_slack_event(event, context):
                 "message": "Malformed event in request body."
             })
         }
-    slack_event = SlackEvent(message_event)
 
-    if not slack_event.is_message():
+    lunchbot_message = LunchbotMessage(message_event)
+
+    if not lunchbot_message.is_valid_message():
         return {
             "statusCode": 200,
             "body": "Ignoring non-message event."
         }
 
-    yn_response = slack_event.get_yn_response()
+    yn_response = lunchbot_message.get_yn_response()
 
-    if yn_response != SlackEvent.YN_RESPONSE_NOT_FOUND:
-        invalidate_previous_responses_from_today(sc, slack_event)
+    if yn_response != LunchbotMessage.YN_RESPONSE_NOT_FOUND:
+        invalidate_previous_responses_from_today(sc, lunchbot_message)
 
-        if yn_response == SlackEvent.YN_YES_RESPONSE:
+        if yn_response == LunchbotMessage.YN_YES_RESPONSE:
             did_bring_lunch = True
         else:
             did_bring_lunch = False
 
-        handle_yes_no_response(slack_event, did_bring_lunch, dynamodb, sc)
+        handle_yes_no_response(lunchbot_message, did_bring_lunch, dynamodb, sc)
 
     return {
         "statusCode": 200,
