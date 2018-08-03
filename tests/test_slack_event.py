@@ -1,4 +1,4 @@
-from slack_event import SlackEvent
+from events import SlackEvent
 
 # Sample events
 normal_message_raw_event = {

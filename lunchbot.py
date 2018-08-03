@@ -1,116 +1,69 @@
-import random
+import os
 
-from lunchbot_records import get_todays_records_for_user, delete_records, store_record
+from slackclient import SlackClient
 
-positive_emojis = [
-    "thumbsup",
-    "heart_eyes",
-    "heart_eyes_cat",
-    "grinning_face_with_star_eyes",
-    "ok_hand",
-    "muscle",
-    "100",
-    "sunglasses",
-    "money_mouth_face",
-    "chart",
-    "moneybag",
-    "kissing_heart",
-    "angel",
-    "dancer",
-    "man_dancing",
-    "the_horns",
-    "call_me_hand",
-    "fist",
-    "i_love_you_hand_sign",
-    "raised_hands",
-    "handshake",
-    "clap",
-    "heart",
-    "tada",
-    "sparkles",
-    "medal",
-    "star",
-    "rainbow",
-    "fire",
-    "white_check_mark",
-    "heavy_check_mark",
-]
+import emojis
+from events import LunchbotMessageEvent
+from db import get_todays_records_for_user, delete_records, store_record
 
-negative_emojis = [
-    "money_with_wings",
-    "persevere",
-    "sweat",
-    "sob",
-    "scream",
-    "face_with_head_bandage",
-    "skull",
-    "poop",
-    "see_no_evil",
-    "scream_cat",
-    "man-gesturing-no",
-    "woman-gesturing-no",
-    "man-shrugging",
-    "woman-shrugging",
-    "man-facepalming",
-    "woman-facepalming",
-    "facepunch",
-    "third_place_medal",
-    "moyai",
-    "no_entry",
-    "no_entry_sign",
-    "heavy_multiplication_x",
-    "x",
-    "negative_squared_cross_mark",
-]
+slack_token = os.environ["SLACK_API_TOKEN"]
+slack_client = SlackClient(slack_token)
 
 
-def get_random_emoji(is_positive):
-    """
-    Pick a random positive or negative emoji based on is_positive flag.
-    """
-    if is_positive:
-        return random.choice(positive_emojis)
-    else:
-        return random.choice(negative_emojis)
+class Lunchbot(object):
+    """The bot which reacts to messages."""
 
+    def __init__(self, message_event):
+        self.message_event = message_event
 
-def handle_yes_no_response(lunchbot_message, did_bring_lunch, sc):
-    emoji = get_random_emoji(did_bring_lunch)
-    print("adding emoji")
-    print(emoji)
-    slack_response = sc.api_call(
-        "reactions.add",
-        channel=lunchbot_message.get_channel(),
-        name=emoji,
-        timestamp=lunchbot_message.get_ts()
-    )
-    print(slack_response)
+    def react_to_message(self):
+        """Send an emoji reaction in response to the message."""
+        yn_response = self.message_event.get_yn_response()
 
-    store_record(
-        ts=lunchbot_message.get_ts(),
-        user_id=lunchbot_message.get_user(),
-        channel_id=lunchbot_message.get_channel(),
-        did_bring_lunch=did_bring_lunch,
-        emoji=emoji
-    )
+        if yn_response == LunchbotMessageEvent.YN_RESPONSE_NOT_FOUND:
+            return
 
+        self.invalidate_previous_responses_from_today()
 
-def invalidate_previous_responses_from_today(sc, lunchbot_message):
-    """Query for existing responses and delete them."""
-    todays_records_for_user = get_todays_records_for_user(lunchbot_message.get_user())
+        if yn_response == LunchbotMessageEvent.YN_YES_RESPONSE:
+            did_bring_lunch = True
+        else:
+            did_bring_lunch = False
 
-    if len(todays_records_for_user) == 0:
-        return
+        emoji = emojis.get_random_emoji(did_bring_lunch)
 
-    # Remove old Slack emoji reactions
-    for record in todays_records_for_user:
-        response = sc.api_call(
-            "reactions.remove",
-            channel=lunchbot_message.get_channel(),
-            name=record["emoji"],
-            timestamp=record["slack_ts"]
+        slack_response = slack_client.api_call(
+            "reactions.add",
+            channel=self.message_event.get_channel(),
+            name=emoji,
+            timestamp=self.message_event.get_ts()
         )
-        print("Slack remove emoji response")
-        print(response)
+        print(slack_response)
 
-    delete_records(todays_records_for_user)
+        store_record(
+            ts=self.message_event.get_ts(),
+            user_id=self.message_event.get_user(),
+            channel_id=self.message_event.get_channel(),
+            did_bring_lunch=did_bring_lunch,
+            emoji=emoji
+        )
+
+    def invalidate_previous_responses_from_today(self):
+        """Query for existing responses and delete them."""
+        todays_records_for_user = get_todays_records_for_user(self.message_event.get_user())
+
+        if len(todays_records_for_user) == 0:
+            return
+
+        # Remove old Slack emoji reactions
+        for record in todays_records_for_user:
+            response = slack_client.api_call(
+                "reactions.remove",
+                channel=self.message_event.get_channel(),
+                name=record["emoji"],
+                timestamp=record["slack_ts"]
+            )
+            print("Slack remove emoji response")
+            print(response)
+
+        delete_records(todays_records_for_user)

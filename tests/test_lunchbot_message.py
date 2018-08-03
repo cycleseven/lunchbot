@@ -1,8 +1,8 @@
-from lunchbot_message import LunchbotMessage
+from events import LunchbotMessageEvent
 
 
 def test_should_recognise_yes_no_from_new_message_events():
-    no_message = LunchbotMessage({
+    no_message = LunchbotMessageEvent({
         "type": "message",
         "channel": "C2147483705",
         "user": "U2147483697",
@@ -11,9 +11,9 @@ def test_should_recognise_yes_no_from_new_message_events():
         # Text is no, so a YN_NO_RESPONSE is expected
         "text": "no"
     })
-    assert no_message.get_yn_response() == LunchbotMessage.YN_NO_RESPONSE
+    assert no_message.get_yn_response() == LunchbotMessageEvent.YN_NO_RESPONSE
 
-    yes_message = LunchbotMessage({
+    yes_message = LunchbotMessageEvent({
         "type": "message",
         "channel": "C2147483705",
         "user": "U2147483697",
@@ -22,9 +22,9 @@ def test_should_recognise_yes_no_from_new_message_events():
         # Text is yes, so a YN_YES_RESPONSE is expected
         "text": "yes"
     })
-    assert yes_message.get_yn_response() == LunchbotMessage.YN_YES_RESPONSE
+    assert yes_message.get_yn_response() == LunchbotMessageEvent.YN_YES_RESPONSE
 
-    neutral_message = LunchbotMessage({
+    neutral_message = LunchbotMessageEvent({
         "type": "message",
         "channel": "C2147483705",
         "user": "U2147483697",
@@ -33,11 +33,11 @@ def test_should_recognise_yes_no_from_new_message_events():
         # Text contains neither yes or no, so a YN_RESPONSE_NOT_FOUND is expected
         "text": "I'm talking about something totally unrelated."
     })
-    assert neutral_message.get_yn_response() == LunchbotMessage.YN_RESPONSE_NOT_FOUND
+    assert neutral_message.get_yn_response() == LunchbotMessageEvent.YN_RESPONSE_NOT_FOUND
 
 
 def test_should_recognise_yes_no_from_edit_message_events():
-    yes_message = LunchbotMessage({
+    yes_message = LunchbotMessageEvent({
         "type": "message",
         "subtype": "message_changed",
         "hidden": True,
@@ -56,4 +56,4 @@ def test_should_recognise_yes_no_from_edit_message_events():
             }
         }
     })
-    assert yes_message.get_yn_response() == LunchbotMessage.YN_YES_RESPONSE
+    assert yes_message.get_yn_response() == LunchbotMessageEvent.YN_YES_RESPONSE
