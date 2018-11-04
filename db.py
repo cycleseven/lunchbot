@@ -3,15 +3,16 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-import boto3
+from services import DynamoClient, DynamoTable, DynamoResource
 from boto3.dynamodb.conditions import Key
 
-dynamodb_client = boto3.client("dynamodb")
-dynamo_resource = boto3.resource("dynamodb")
-table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
+
+# TODO: if possible, refactor so these all use the same boto object (ie. always use DynamoTableService).
+#       This will allow some code to be deleted in services.py
 
 
 def get_todays_records_for_user(user_id):
+    table = DynamoTable.get_table()
     now = datetime.utcnow()
     start_of_today = datetime(now.year, now.month, now.day).timestamp()
 
@@ -22,6 +23,7 @@ def get_todays_records_for_user(user_id):
 
 
 def delete_records(records):
+    dynamo_resource = DynamoResource.get_resource()
     delete_requests = [
         {
             "DeleteRequest": {
@@ -40,6 +42,8 @@ def delete_records(records):
 
 
 def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
+    dynamodb_client = DynamoClient.get_client()
+
     return dynamodb_client.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],
         Item={

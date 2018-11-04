@@ -11,10 +11,9 @@ def on_slack_event(event, context):
     print("Received event from Slack.")
     pprint(event)
 
-    # Parse raw Lambda event to model (slack_event instance)
+    # Parse
     try:
-        body = json.loads(event["body"])
-        message_event = body["event"]
+        lunchbot_message = LunchbotMessageEvent.create_from_api_gateway_event(event)
     except KeyError:
         return {
             "statusCode": 400,
@@ -23,12 +22,13 @@ def on_slack_event(event, context):
             })
         }
 
-    lunchbot_message = LunchbotMessageEvent(message_event)
-
+    # Validate
     if not lunchbot_message.is_valid_message():
         return {
-            "statusCode": 200,
-            "body": "Ignoring non-message event."
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Invalid event, expected a Slack message. https://api.slack.com/events/message"
+            })
         }
 
     lunchbot = Lunchbot(lunchbot_message)

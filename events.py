@@ -1,3 +1,5 @@
+import json
+
 from strings import appears_in
 
 
@@ -48,6 +50,11 @@ class LunchbotMessageEvent(SlackEvent):
         "no",
         "cilia"
     ]
+
+    @staticmethod
+    def create_from_api_gateway_event(event):
+        body = json.loads(event["body"])
+        return LunchbotMessageEvent(body["event"])
 
     def get_yn_response(self):
         """Return YN_YES_RESPONSE if a "yes" is detected in the message, or YN_NO_RESPONSE for no. Otherwise, return
