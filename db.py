@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from services import DynamoClient, DynamoTable, DynamoResource
+from services import Dynamo
 from boto3.dynamodb.conditions import Key
 
 
@@ -12,7 +12,7 @@ from boto3.dynamodb.conditions import Key
 
 
 def get_todays_records_for_user(user_id):
-    table = DynamoTable.get_table()
+    table = Dynamo.get_table()
     now = datetime.utcnow()
     start_of_today = datetime(now.year, now.month, now.day).timestamp()
 
@@ -23,7 +23,7 @@ def get_todays_records_for_user(user_id):
 
 
 def delete_records(records):
-    dynamo_resource = DynamoResource.get_resource()
+    dynamo_resource = Dynamo.get_resource()
     delete_requests = [
         {
             "DeleteRequest": {
@@ -42,7 +42,7 @@ def delete_records(records):
 
 
 def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
-    dynamodb_client = DynamoClient.get_client()
+    dynamodb_client = Dynamo.get_client()
 
     return dynamodb_client.put_item(
         TableName=os.environ["DYNAMODB_TABLE"],

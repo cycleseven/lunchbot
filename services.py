@@ -17,40 +17,33 @@ class Slack(object):
         return Slack.client
 
 
-class DynamoTable(object):
-    table = None
-
-    @staticmethod
-    def get_table():
-        if DynamoTable.table is not None:
-            return DynamoTable.table
-
-        dynamo_resource = boto3.resource("dynamodb")
-        DynamoTable.table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
-        return DynamoTable.table
-
-
-# TODO: see if we can get rid of this by refactoring db.py
-class DynamoClient(object):
+# TODO: see about getting rid of client + resource, they're not needed
+class Dynamo(object):
     client = None
-
-    @staticmethod
-    def get_client():
-        if DynamoTable.client is not None:
-            return DynamoTable.client
-
-        DynamoTable.client = boto3.client("dynamodb")
-        return DynamoTable.client
-
-
-# TODO: see if we can get rid of this by refactoring db.py
-class DynamoResource(object):
+    table = None
     resource = None
 
     @staticmethod
-    def get_resource():
-        if DynamoTable.resource is not None:
-            return DynamoTable.resource
+    def get_table():
+        if Dynamo.table is not None:
+            return Dynamo.table
 
-        DynamoTable.resource = boto3.resource("dynamodb")
-        return DynamoTable.resource
+        dynamo_resource = boto3.resource("dynamodb")
+        Dynamo.table = dynamo_resource.Table(os.environ["DYNAMODB_TABLE"])
+        return Dynamo.table
+
+    @staticmethod
+    def get_client():
+        if Dynamo.client is not None:
+            return Dynamo.client
+
+        Dynamo.client = boto3.client("dynamodb")
+        return Dynamo.client
+
+    @staticmethod
+    def get_resource():
+        if Dynamo.resource is not None:
+            return Dynamo.resource
+
+        Dynamo.resource = boto3.resource("dynamodb")
+        return Dynamo.resource

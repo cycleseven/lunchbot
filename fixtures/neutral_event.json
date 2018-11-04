@@ -1,0 +1,120 @@
+{
+    "body": "{\"token\":\"TEST_TOKEN\",\"team_id\":\"TEST_TEAM\",\"api_app_id\":\"TEST_APP\",\"event\":{\"type\":\"message\",\"user\":\"TEST_USER\",\"text\":\"not a yn response\",\"client_msg_id\":\"TEST_MESSAGE_ID\",\"ts\":\"1541161680.003400\",\"channel\":\"TEST_CHANNEL\",\"event_ts\":\"1541161680.003400\",\"channel_type\":\"channel\"},\"type\":\"event_callback\",\"event_id\":\"TEST_EVENT\",\"event_time\":1541161680,\"authed_users\":[\"TEST_USER\"]}",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip,deflate",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-Country": "US",
+        "Content-Type": "application/json",
+        "Host": "lunchbot.cy7.io",
+        "User-Agent": "Slackbot 1.0 (+https://api.slack.com/robots)",
+        "Via": "1.1 somedomain.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "test-cf-id",
+        "X-Amzn-Trace-Id": "Root=test-trace-id",
+        "X-Forwarded-For": "some, ips",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https",
+        "X-Slack-Request-Timestamp": "1541161680",
+        "X-Slack-Signature": "v0=signature"
+    },
+    "httpMethod": "POST",
+    "isBase64Encoded": false,
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip,deflate"
+        ],
+        "CloudFront-Forwarded-Proto": [
+            "https"
+        ],
+        "CloudFront-Is-Desktop-Viewer": [
+            "true"
+        ],
+        "CloudFront-Is-Mobile-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-SmartTV-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-Tablet-Viewer": [
+            "false"
+        ],
+        "CloudFront-Viewer-Country": [
+            "US"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Host": [
+            "lunchbot.cy7.io"
+        ],
+        "User-Agent": [
+            "Slackbot 1.0 (+https://api.slack.com/robots)"
+        ],
+        "Via": [
+            "1.1 somedomain.cloudfront.net (CloudFront)"
+        ],
+        "X-Amz-Cf-Id": [
+            "test-cf-id"
+        ],
+        "X-Amzn-Trace-Id": [
+            "test-trace-id"
+        ],
+        "X-Forwarded-For": [
+            "some, ips"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ],
+        "X-Slack-Request-Timestamp": [
+            "1541161680"
+        ],
+        "X-Slack-Signature": [
+            "v0=signature"
+        ]
+    },
+    "multiValueQueryStringParameters": null,
+    "path": "/events/",
+    "pathParameters": null,
+    "queryStringParameters": null,
+    "requestContext": {
+        "accountId": "TEST_AWS_ACCOUNT",
+        "apiId": "TEST_API_GATEWAY_INSTANCE",
+        "domainName": "lunchbot.cy7.io",
+        "domainPrefix": "lunchbot",
+        "extendedRequestId": "something",
+        "httpMethod": "POST",
+        "identity": {
+            "accessKey": null,
+            "accountId": null,
+            "caller": null,
+            "cognitoAuthenticationProvider": null,
+            "cognitoAuthenticationType": null,
+            "cognitoIdentityId": null,
+            "cognitoIdentityPoolId": null,
+            "sourceIp": "ip",
+            "user": null,
+            "userAgent": "Slackbot 1.0 (+https://api.slack.com/robots)",
+            "userArn": null
+        },
+        "path": "/events/",
+        "protocol": "HTTP/1.1",
+        "requestId": "uuid",
+        "requestTime": "02/Nov/2018:12:28:00 +0000",
+        "requestTimeEpoch": 1541161680761,
+        "resourceId": "TEST_RESOURCE",
+        "resourcePath": "/events",
+        "stage": "dev"
+    },
+    "resource": "/events",
+    "stageVariables": null
+}
