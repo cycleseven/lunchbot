@@ -17,11 +17,10 @@ class Slack(object):
         return Slack.client
 
 
-# TODO: see about getting rid of client + resource, they're not needed
+# TODO: see about getting rid of client (in favour of using table everywhere)
 class Dynamo(object):
     client = None
     table = None
-    resource = None
 
     @staticmethod
     def get_table():
@@ -39,11 +38,3 @@ class Dynamo(object):
 
         Dynamo.client = boto3.client("dynamodb")
         return Dynamo.client
-
-    @staticmethod
-    def get_resource():
-        if Dynamo.resource is not None:
-            return Dynamo.resource
-
-        Dynamo.resource = boto3.resource("dynamodb")
-        return Dynamo.resource

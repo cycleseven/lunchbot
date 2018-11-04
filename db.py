@@ -23,22 +23,10 @@ def get_todays_records_for_user(user_id):
 
 
 def delete_records(records):
-    dynamo_resource = Dynamo.get_resource()
-    delete_requests = [
-        {
-            "DeleteRequest": {
-                "Key": {
-                    "user_id": item["user_id"],
-                    "timestamp": item["timestamp"]
-                }
-            }
-        } for item in records
-    ]
-    return dynamo_resource.batch_write_item(
-        RequestItems={
-            os.environ["DYNAMODB_TABLE"]: delete_requests
-        }
-    )
+    dynamo_table = Dynamo.get_table()
+    with dynamo_table.batch_write() as batch:
+        for record in records:
+            batch.delete_item(Key={"user_id": record["user_id"], "timestamp": record["timestamp"]})
 
 
 def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
