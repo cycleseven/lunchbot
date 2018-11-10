@@ -1,4 +1,4 @@
-from events import LunchbotMessageEvent
+from lunchbot.events import LunchbotMessageEvent
 
 
 def test_should_recognise_yes_no_from_new_message_events():

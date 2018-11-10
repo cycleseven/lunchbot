@@ -2,8 +2,9 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from services import Dynamo
 from boto3.dynamodb.conditions import Key
+
+from lunchbot.services import Dynamo
 
 
 def get_todays_records_for_user(user_id):

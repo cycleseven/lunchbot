@@ -1,4 +1,4 @@
-from strings import is_subsequence
+from lunchbot.strings import is_subsequence
 
 
 def test_should_return_true_for_subsequence_at_end_of_long_list():

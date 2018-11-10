@@ -1,8 +1,6 @@
-from services import Slack
-
-import db
-import emojis
-from events import LunchbotMessageEvent
+from lunchbot import emojis, db
+from lunchbot.events import LunchbotMessageEvent
+from lunchbot.services import Slack
 
 
 class Lunchbot(object):

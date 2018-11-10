@@ -1,6 +1,6 @@
 import json
 
-from strings import appears_in
+from lunchbot.strings import appears_in
 
 
 class SlackEvent(object):

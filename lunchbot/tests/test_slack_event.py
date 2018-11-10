@@ -1,4 +1,4 @@
-from events import SlackEvent
+from lunchbot.events import SlackEvent
 
 # Sample events
 normal_message_raw_event = {

@@ -1,8 +1,8 @@
 import json
 from pprint import pprint
 
-from lunchbot import Lunchbot
-from events import LunchbotMessageEvent
+from lunchbot.lunchbot import Lunchbot
+from lunchbot.events import LunchbotMessageEvent
 
 
 def on_slack_event(event, context):
