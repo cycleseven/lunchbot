@@ -8,10 +8,10 @@ def test_should_recognise_yes_no_from_new_message_events():
         "user": "U2147483697",
         "ts": "1355517523.000005",
 
-        # Text is no, so a YN_NO_RESPONSE is expected
+        # Text is no, so user didn't bring lunch
         "text": "no"
     })
-    assert no_message.get_yn_response() == LunchbotMessageEvent.YN_NO_RESPONSE
+    assert no_message.did_user_bring_lunch() is False
 
     yes_message = LunchbotMessageEvent({
         "type": "message",
@@ -19,10 +19,10 @@ def test_should_recognise_yes_no_from_new_message_events():
         "user": "U2147483697",
         "ts": "1355517523.000005",
 
-        # Text is yes, so a YN_YES_RESPONSE is expected
+        # Text is yes, so user *did* bring lunch
         "text": "yes"
     })
-    assert yes_message.get_yn_response() == LunchbotMessageEvent.YN_YES_RESPONSE
+    assert yes_message.did_user_bring_lunch() is True
 
     neutral_message = LunchbotMessageEvent({
         "type": "message",
@@ -30,10 +30,12 @@ def test_should_recognise_yes_no_from_new_message_events():
         "user": "U2147483697",
         "ts": "1355517523.000005",
 
-        # Text contains neither yes or no, so a YN_RESPONSE_NOT_FOUND is expected
+        # Text contains neither yes or no, so this is a neutral message
         "text": "I'm talking about something totally unrelated."
     })
-    assert neutral_message.get_yn_response() == LunchbotMessageEvent.YN_RESPONSE_NOT_FOUND
+
+    # did_user_bring_lunch() returns None for neutral messages
+    assert neutral_message.did_user_bring_lunch() is None
 
 
 def test_should_recognise_yes_no_from_edit_message_events():
@@ -47,7 +49,7 @@ def test_should_recognise_yes_no_from_edit_message_events():
             "type": "message",
             "user": "U2147483697",
 
-            # Text is yes, so a YN_YES_RESPONSE is expected
+            # Text is yes, so user *did* bring lunch
             "text": "yes",
             "ts": "1355517523.000005",
             "edited": {
@@ -56,4 +58,4 @@ def test_should_recognise_yes_no_from_edit_message_events():
             }
         }
     })
-    assert yes_message.get_yn_response() == LunchbotMessageEvent.YN_YES_RESPONSE
+    assert yes_message.did_user_bring_lunch() is True

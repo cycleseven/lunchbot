@@ -16,20 +16,15 @@ class Lunchbot(object):
 
     def react_to_message(self):
         """Send an emoji reaction in response to the message."""
-        yn_response = self.message_event.get_yn_response()
+        did_bring_lunch = self.message_event.user_did_bring_lunch()
 
-        if yn_response == LunchbotMessageEvent.YN_RESPONSE_NOT_FOUND:
+        # Ignore neutral messages
+        if did_bring_lunch is None:
             return
 
         self.invalidate_previous_responses_from_today()
 
-        if yn_response == LunchbotMessageEvent.YN_YES_RESPONSE:
-            did_bring_lunch = True
-        else:
-            did_bring_lunch = False
-
         emoji = emojis.get_random_emoji(did_bring_lunch)
-
         slack_response = self.slack_client.api_call(
             "reactions.add",
             channel=self.message_event.get_channel(),

@@ -40,10 +40,6 @@ class SlackEvent(object):
 
 
 class LunchbotMessageEvent(SlackEvent):
-    YN_YES_RESPONSE = "YN_YES_RESPONSE"
-    YN_NO_RESPONSE = "YN_NO_RESPONSE"
-    YN_RESPONSE_NOT_FOUND = "YN_RESPONSE_NOT_FOUND"
-
     positive_words = [
         "yes",
         "aye",
@@ -60,18 +56,14 @@ class LunchbotMessageEvent(SlackEvent):
         http_body = json.loads(api_gateway_event["body"])
         return LunchbotMessageEvent(http_body["event"])
 
-    def get_yn_response(self):
-        """Return YN_YES_RESPONSE if a "yes" is detected in the message, or YN_NO_RESPONSE for no. Otherwise, return
-        YN_RESPONSE_NOT_FOUND.
-        """
+    def user_did_bring_lunch(self):
+        """Return True if a "yes" is detected in the message, or False for no. Otherwise, return None."""
         text = self.get_text()
         tokens = text.lower().split()
 
         if any(appears_in(word, tokens) for word in self.positive_words):
             logger.info("Affirmative response detected using complex deep neural net algorithm.")
-            return self.YN_YES_RESPONSE
+            return True
         elif any(appears_in(word, tokens) for word in self.negative_words):
             logger.info("Negative response detected using complex deep neural net algorithm.")
-            return self.YN_NO_RESPONSE
-        else:
-            return self.YN_RESPONSE_NOT_FOUND
+            return False
