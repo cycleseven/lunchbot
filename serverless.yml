@@ -29,7 +29,7 @@ plugins:
 
 functions:
   on_slack_event:
-    handler: handlers.on_slack_event
+    handler: lunchbot.handlers.on_slack_event
     events:
       - http:
           path: events
