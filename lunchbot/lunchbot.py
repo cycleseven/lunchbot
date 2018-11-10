@@ -1,6 +1,12 @@
+import logging
+from pprint import pformat
+
 from lunchbot import emojis, db
 from lunchbot.events import LunchbotMessageEvent
 from lunchbot.services import Slack
+
+
+logger = logging.getLogger(__name__)
 
 
 class Lunchbot(object):
@@ -30,7 +36,9 @@ class Lunchbot(object):
             name=emoji,
             timestamp=self.message_event.get_ts()
         )
-        print(slack_response)
+
+        logger.debug("Called reactions.add in Slack API")
+        logger.debug(pformat(slack_response))
 
         db.store_record(
             ts=self.message_event.get_ts(),
@@ -55,7 +63,8 @@ class Lunchbot(object):
                 name=record["emoji"],
                 timestamp=record["slack_ts"]
             )
-            print("Slack remove emoji response")
-            print(response)
+
+            logger.debug("Called reactions.remove in Slack API")
+            logger.debug(pformat(response))
 
         db.delete_records(todays_records_for_user)

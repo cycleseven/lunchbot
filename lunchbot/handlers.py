@@ -1,15 +1,19 @@
 import json
-from pprint import pprint
+import logging
+from pprint import pformat
 
 from lunchbot.lunchbot import Lunchbot
 from lunchbot.events import LunchbotMessageEvent
 
 
+logger = logging.getLogger(__name__)
+
+
 def on_slack_event(event, context):
     """Lambda handler called when a new event from Slack is POSTed."""
 
-    print("Received event from Slack.")
-    pprint(event)
+    logger.debug("Received event from Slack.")
+    logger.debug(pformat(event))
 
     # Parse
     try:

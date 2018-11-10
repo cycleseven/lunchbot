@@ -1,6 +1,10 @@
 import json
+import logging
 
 from lunchbot.strings import appears_in
+
+
+logger = logging.getLogger(__name__)
 
 
 class SlackEvent(object):
@@ -64,10 +68,10 @@ class LunchbotMessageEvent(SlackEvent):
         tokens = text.lower().split()
 
         if any(appears_in(word, tokens) for word in self.positive_words):
-            print("Affirmative response detected using complex deep neural net algorithm.")
+            logger.info("Affirmative response detected using complex deep neural net algorithm.")
             return self.YN_YES_RESPONSE
         elif any(appears_in(word, tokens) for word in self.negative_words):
-            print("Negative response detected using complex deep neural net algorithm.")
+            logger.info("Negative response detected using complex deep neural net algorithm.")
             return self.YN_NO_RESPONSE
         else:
             return self.YN_RESPONSE_NOT_FOUND
