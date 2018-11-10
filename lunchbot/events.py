@@ -56,9 +56,9 @@ class LunchbotMessageEvent(SlackEvent):
     ]
 
     @staticmethod
-    def create_from_api_gateway_event(event):
-        body = json.loads(event["body"])
-        return LunchbotMessageEvent(body["event"])
+    def create_from_api_gateway_event(api_gateway_event):
+        http_body = json.loads(api_gateway_event["body"])
+        return LunchbotMessageEvent(http_body["event"])
 
     def get_yn_response(self):
         """Return YN_YES_RESPONSE if a "yes" is detected in the message, or YN_NO_RESPONSE for no. Otherwise, return
