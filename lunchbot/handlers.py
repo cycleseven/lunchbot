@@ -1,7 +1,7 @@
 import json
-import logging
 from pprint import pformat
 
+from lunchbot import logging
 from lunchbot.lunchbot import Lunchbot
 from lunchbot.events import LunchbotMessageEvent
 

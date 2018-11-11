@@ -56,7 +56,7 @@ class LunchbotMessageEvent(SlackEvent):
         http_body = json.loads(api_gateway_event["body"])
         return LunchbotMessageEvent(http_body["event"])
 
-    def user_did_bring_lunch(self):
+    def did_user_bring_lunch(self):
         """Return True if a "yes" is detected in the message, or False for no. Otherwise, return None."""
         text = self.get_text()
         tokens = text.lower().split()

@@ -30,26 +30,12 @@ def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
 
     return dynamo_table.put_item(
         Item={
-            "id": {
-                "S": str(uuid.uuid4())
-            },
-            "timestamp": {
-                "N": ts
-            },
-            "slack_ts": {
-                "S": ts
-            },
-            "user_id": {
-                "S": user_id
-            },
-            "channel_id": {
-                "S": channel_id
-            },
-            "did_bring_lunch": {
-                "BOOL": did_bring_lunch
-            },
-            "emoji": {
-                "S": emoji
-            }
+            "id": str(uuid.uuid4()),
+            "timestamp": Decimal(ts),
+            "slack_ts": ts,
+            "user_id": user_id,
+            "channel_id": channel_id,
+            "did_bring_lunch": did_bring_lunch,
+            "emoji": emoji,
         }
     )

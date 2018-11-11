@@ -1,8 +1,6 @@
-import logging
 from pprint import pformat
 
-from lunchbot import emojis, db
-from lunchbot.events import LunchbotMessageEvent
+from lunchbot import emojis, db, logging
 from lunchbot.services import Slack
 
 
@@ -16,7 +14,7 @@ class Lunchbot(object):
 
     def react_to_message(self):
         """Send an emoji reaction in response to the message."""
-        did_bring_lunch = self.message_event.user_did_bring_lunch()
+        did_bring_lunch = self.message_event.did_user_bring_lunch()
 
         # Ignore neutral messages
         if did_bring_lunch is None:
