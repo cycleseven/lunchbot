@@ -20,7 +20,7 @@ def get_todays_records_for_user(user_id):
 
 def delete_records(records):
     dynamo_table = Dynamo.get_table()
-    with dynamo_table.batch_write() as batch:
+    with dynamo_table.batch_writer() as batch:
         for record in records:
             batch.delete_item(Key={"user_id": record["user_id"], "timestamp": record["timestamp"]})
 
