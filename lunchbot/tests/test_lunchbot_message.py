@@ -4,33 +4,18 @@ from lunchbot.events import LunchbotMessageEvent
 def test_should_recognise_yes_no_from_new_message_events():
     no_message = LunchbotMessageEvent({
         "type": "message",
-        "channel": "C2147483705",
-        "user": "U2147483697",
-        "ts": "1355517523.000005",
-
-        # Text is no, so user didn't bring lunch
         "text": "no"
     })
     assert no_message.did_user_bring_lunch() is False
 
     yes_message = LunchbotMessageEvent({
         "type": "message",
-        "channel": "C2147483705",
-        "user": "U2147483697",
-        "ts": "1355517523.000005",
-
-        # Text is yes, so user *did* bring lunch
         "text": "yes"
     })
     assert yes_message.did_user_bring_lunch() is True
 
     neutral_message = LunchbotMessageEvent({
         "type": "message",
-        "channel": "C2147483705",
-        "user": "U2147483697",
-        "ts": "1355517523.000005",
-
-        # Text contains neither yes or no, so this is a neutral message
         "text": "I'm talking about something totally unrelated."
     })
 
@@ -42,20 +27,39 @@ def test_should_recognise_yes_no_from_edit_message_events():
     yes_message = LunchbotMessageEvent({
         "type": "message",
         "subtype": "message_changed",
-        "hidden": True,
-        "channel": "C2147483705",
-        "ts": "1358878755.000001",
         "message": {
             "type": "message",
-            "user": "U2147483697",
-
-            # Text is yes, so user *did* bring lunch
             "text": "yes",
-            "ts": "1355517523.000005",
-            "edited": {
-                "user": "U2147483697",
-                "ts": "1358878755.000001"
-            }
         }
     })
     assert yes_message.did_user_bring_lunch() is True
+
+
+def test_should_handle_spaces_between_characters():
+    yes_message = LunchbotMessageEvent({
+        "type": "message",
+        "text": "y   e   s"
+    })
+    assert yes_message.did_user_bring_lunch() is True
+
+
+def test_should_handle_surrounding_content():
+    yes_message = LunchbotMessageEvent({
+        "type": "message",
+        "text": "yes I did bring lunch"
+    })
+    assert yes_message.did_user_bring_lunch() is True
+
+
+def test_should_handle_capitalisation_differences():
+    yes_message = LunchbotMessageEvent({
+        "type": "message",
+        "text": "Yes"
+    })
+    assert yes_message.did_user_bring_lunch() is True
+
+    no_message = LunchbotMessageEvent({
+        "type": "message",
+        "text": "nO"
+    })
+    assert no_message.did_user_bring_lunch() is False
