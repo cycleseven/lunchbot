@@ -9,7 +9,7 @@ from lunchbot.events import LunchbotMessageEvent
 logger = logging.getLogger(__name__)
 
 
-def on_slack_event(event, context):
+def on_slack_event(event, _context):
     """Lambda handler called when a new event from Slack is POSTed."""
 
     logger.debug("Received event from Slack.")
@@ -42,3 +42,16 @@ def on_slack_event(event, context):
         "statusCode": 200,
         "body": json.dumps({"message": "Successfully processed Slack event."})
     }
+
+
+def generate_monthly_report(_event, _context):
+    # Pull all records that match the following criteria:
+    #   * from this month
+    #   * from the #haveyoubroughtlunch channel
+
+    # Find the distinct users in the records
+    # For each distinct user, get their info (ratio, money saved and name)
+    # Work out who the winner is
+    # Generate a message template, using generated stats + a random selection of fun strings
+    # Post the message to #haveyoubroughtlunch
+    pass
