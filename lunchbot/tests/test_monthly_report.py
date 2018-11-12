@@ -18,16 +18,16 @@ def test_should_count_good_days_for_user():
 
 
 def test_should_estimate_money_saved():
-    """Assume an average lunch cost of £5"""
+    """Assume an average saving of £4"""
     assert estimate_money_saved([
         {"did_bring_lunch": True},
         {"did_bring_lunch": False},
         {"did_bring_lunch": True},
         {"did_bring_lunch": True},
-    ]) == 15
+    ]) == 12
 
     assert estimate_money_saved([{"did_bring_lunch": False}]) == 0
-    assert estimate_money_saved([{"did_bring_lunch": True}]) == 5
+    assert estimate_money_saved([{"did_bring_lunch": True}]) == 4
     assert estimate_money_saved([]) == 0
 
 

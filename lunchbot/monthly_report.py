@@ -9,11 +9,11 @@ def count_good_days(records):
 
 
 def estimate_money_saved(records):
-    """The average lunch cost would ideally be configurable to suit different teams. To keep things simple,
-    £5 is hardcoded here."""
-    average_lunch_cost_in_pounds = 5
+    """The average £££ saved by bringing your own lunch would ideally be configurable to suit different teams :)
+    To keep things simple, a value is hardcoded here."""
+    average_lunch_saving_in_pounds = 4
     num_good_days = count_good_days(records)
-    return average_lunch_cost_in_pounds * num_good_days
+    return average_lunch_saving_in_pounds * num_good_days
 
 
 def get_distinct_users(records):
