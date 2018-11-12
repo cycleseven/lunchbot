@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from lunchbot.services import Slack
 
 
@@ -22,3 +24,10 @@ def fetch_user_name(user_id):
     slack_client = Slack.get_client()
     slack_response = slack_client.api_call("users.profile.get", user=user_id)
     return slack_response["profile"]["name"]
+
+
+def count_distinct_days(records):
+    return len(set(
+        datetime.utcfromtimestamp(record["timestamp"]).date()
+        for record in records
+    ))

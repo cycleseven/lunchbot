@@ -35,6 +35,8 @@ functions:
           path: events
           method: post
           cors: true
+  record_months:
+    handler: lunchbot.handlers.record_months
 
 resources:
   Resources:

@@ -1,4 +1,7 @@
-from lunchbot.monthly_report import count_good_days, estimate_money_saved, get_distinct_users
+import datetime
+
+from lunchbot.monthly_report import count_good_days, estimate_money_saved, get_distinct_users, \
+    count_distinct_days
 
 
 def test_should_count_good_days_for_user():
@@ -39,3 +42,16 @@ def test_should_identify_distinct_users():
     ]) == {"AAA", "BBB", "CCC", "DDD"}
 
     assert get_distinct_users([]) == set()
+
+
+def test_should_count_distinct_days():
+    assert count_distinct_days([
+        {"timestamp": datetime.datetime(year=2018, month=1, day=1, tzinfo=datetime.timezone.utc).timestamp()},
+        {"timestamp": datetime.datetime(year=2018, month=1, day=1, tzinfo=datetime.timezone.utc).timestamp()},
+        {"timestamp": datetime.datetime(year=2018, month=1, day=2, tzinfo=datetime.timezone.utc).timestamp()},
+        {"timestamp": datetime.datetime(year=2018, month=1, day=2, tzinfo=datetime.timezone.utc).timestamp()},
+        {"timestamp": datetime.datetime(year=2018, month=1, day=2, tzinfo=datetime.timezone.utc).timestamp()},
+        {"timestamp": datetime.datetime(year=2018, month=1, day=3, tzinfo=datetime.timezone.utc).timestamp()},
+    ]) == 3
+
+    assert count_distinct_days([]) == 0

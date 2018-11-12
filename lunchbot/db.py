@@ -18,6 +18,15 @@ def get_todays_records_for_user(user_id):
     )["Items"]
 
 
+def get_monthly_records():
+    table = Dynamo.get_table()
+    now = datetime.utcnow()
+    month_key = f"{now.month}/{now.year}"
+
+    # TODO: this will need to query an index, as month isn't the partition key
+    return table.query(KeyConditionExpression=Key("month").eq(month_key))["Items"]
+
+
 def delete_records(records):
     dynamo_table = Dynamo.get_table()
     with dynamo_table.batch_writer() as batch:
@@ -28,6 +37,9 @@ def delete_records(records):
 def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
     dynamo_table = Dynamo.get_table()
 
+    date = datetime.utcfromtimestamp(int(float(ts))).date()
+    month_key = f"{date.month}/{date.year}"
+
     return dynamo_table.put_item(
         Item={
             "id": str(uuid.uuid4()),
@@ -37,5 +49,6 @@ def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
             "channel_id": channel_id,
             "did_bring_lunch": did_bring_lunch,
             "emoji": emoji,
+            "month": month_key
         }
     )
