@@ -1,3 +1,4 @@
+import os
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -23,8 +24,18 @@ def get_monthly_records():
     now = datetime.utcnow()
     month_key = f"{now.month}/{now.year}"
 
-    # TODO: this will need to query an index, as month isn't the partition key
-    return table.query(KeyConditionExpression=Key("month").eq(month_key))["Items"]
+    return table.query(
+        IndexName=os.environ["DYNAMODB_TABLE_INDEX_BY_MONTH"],
+        KeyConditionExpression=Key("month").eq(month_key)
+    )["Items"]
+
+
+def get_monthly_records_for_channel(channel_id):
+    # It's probably possible to be smarter about the DB structure to avoid looping over records,
+    # but the max no. records expected per month is maybe about 25 per person, so realistically,
+    # this isn't a big deal
+    all_monthly_records = get_monthly_records()
+    return [record for record in all_monthly_records if record["channel_id"] == channel_id]
 
 
 def delete_records(records):

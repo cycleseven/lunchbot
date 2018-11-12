@@ -8,6 +8,7 @@ provider:
   name: aws
   runtime: python3.6
   environment:
+    DYNAMODB_TABLE_INDEX_BY_MONTH: by_month
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
     SLACK_API_TOKEN: ${file(./secrets.yml):SLACK_API_TOKEN}
   iamRoleStatements:
@@ -35,6 +36,8 @@ functions:
           path: events
           method: post
           cors: true
+  generate_monthly_report:
+    handler: lunchbot.handlers.generate_monthly_report
   record_months:
     handler: lunchbot.handlers.record_months
 
@@ -51,6 +54,9 @@ resources:
           -
             AttributeName: user_id
             AttributeType: S
+          -
+            AttributeName: month
+            AttributeType: S
         KeySchema:
           -
             AttributeName: user_id
@@ -62,6 +68,21 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        GlobalSecondaryIndexes:
+          -
+            IndexName: ${self:provider.environment.DYNAMODB_TABLE_INDEX_BY_MONTH}
+            KeySchema:
+              -
+                AttributeName: month
+                KeyType: HASH
+              -
+                AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
 custom:
   customDomain:

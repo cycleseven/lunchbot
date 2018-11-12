@@ -46,25 +46,17 @@ def on_slack_event(event, _context):
 
 
 def generate_monthly_report(_event, _context):
-    # Pull all records that match the following criteria:
-    #   * from this month
-    #   * from the #haveyoubroughtlunch channel
-
-    # Find the distinct users in the records
-    # For each distinct user, get their info (ratio, money saved and name)
-    # Work out who the winner is
-    # Generate a message template, using generated stats + a random selection of fun strings
-    # Post the message to #haveyoubroughtlunch
     logger.info("Generating monthly report")
 
-    records = db.get_monthly_records()
-    users = monthly_report.get_distinct_users(records)
+    # TODO: channel shouldn't be hardcoded, what if it changes, or another team installs the app?
+    records = db.get_monthly_records_for_channel("C8X98ND0E")
+    users = monthly_report.fetch_users(records)
 
     stats = []
     for user in users:
-        user_records = [record for record in records if record["user_id"] == user]
+        user_records = [record for record in records if record["user_id"] == user["id"]]
         stats.append({
-            "name": monthly_report.fetch_user_name(user),
+            "name": user["name"],
             "good_days": monthly_report.count_good_days(user_records),
             "total_days": monthly_report.count_distinct_days(records),
             "estimated_money_saved": monthly_report.estimate_money_saved(user_records),

@@ -1,6 +1,11 @@
 from datetime import datetime
+from pprint import pformat
 
+from lunchbot import logging
 from lunchbot.services import Slack
+
+
+logger = logging.getLogger(__name__)
 
 
 def count_good_days(records):
@@ -20,10 +25,26 @@ def get_distinct_users(records):
     return set(record["user_id"] for record in records)
 
 
-def fetch_user_name(user_id):
-    slack_client = Slack.get_client()
-    slack_response = slack_client.api_call("users.profile.get", user=user_id)
-    return slack_response["profile"]["name"]
+def fetch_users(records):
+    """Query the Slack API for the names of all unique users in the records. Return
+    each user as a dict of { "id", "name" }"""
+    distinct_user_ids = get_distinct_users(records)
+
+    users = []
+    for user_id in distinct_user_ids:
+        slack_client = Slack.get_client()
+        slack_response = slack_client.api_call("users.info", user=user_id)
+
+        logger.debug(f"Checked user name for user ID {user_id}")
+        logger.debug(pformat(slack_response))
+
+        if slack_response["ok"]:
+            users.append({
+                "id": user_id,
+                "name": slack_response["user"]["name"]
+            })
+
+    return users
 
 
 def count_distinct_days(records):
