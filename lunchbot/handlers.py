@@ -1,11 +1,12 @@
 import datetime
 import json
+import os
 from pprint import pformat
 
 from lunchbot import logging, db, monthly_report
 from lunchbot.lunchbot import Lunchbot
 from lunchbot.events import LunchbotMessageEvent
-from lunchbot.services import Dynamo
+from lunchbot.services import Dynamo, Slack
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,13 @@ def generate_monthly_report(_event, _context):
     records = db.get_monthly_records_for_channel()
     users = monthly_report.fetch_users(records)
     stats = monthly_report.get_monthly_stats(records, users)
+    summary = monthly_report.summarise_results(stats)
 
-    logger.info(monthly_report.summarise_results(stats))
+    logger.info("Posting the following summary...")
+    logger.info(summary)
+
+    slack_client = Slack.get_client()
+    slack_client.api_call("chat.postMessage", channel=os.environ["SLACK_CHANNEL"], text=summary)
 
 
 def record_months(_event, _context):

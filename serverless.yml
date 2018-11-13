@@ -23,7 +23,9 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:DescribeTable
         - dynamodb:BatchWriteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      Resource:
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
 
 plugins:
   - serverless-domain-manager
@@ -39,6 +41,8 @@ functions:
           cors: true
   generate_monthly_report:
     handler: lunchbot.handlers.generate_monthly_report
+    events:
+      - schedule: cron(0 16 ? * 6L *)
   record_months:
     handler: lunchbot.handlers.record_months
 
