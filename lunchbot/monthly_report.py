@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from pprint import pformat
 
@@ -71,3 +72,79 @@ def get_monthly_stats(records, users):
 def get_winners(stats):
     max_good_days = max(stats, key=lambda item: item["good_days"])["good_days"]
     return [stat["name"] for stat in stats if stat["good_days"] == max_good_days]
+
+
+def summarise_stat(stat):
+    pet_names = [
+        "sweet pea",
+        "human",
+        "fellow",
+        "angel",
+        "colleague",
+        "boiii",
+        "friend",
+        "individual",
+        "person",
+        "muffin",
+        "amiga/amigo",
+        "inspiration",
+        "acquaintance"
+    ]
+
+    ratio = stat["good_days"] / stat["total_days"]
+
+    if 0 <= ratio <= 0.2:
+        words_of_encouragement = random.choice([
+            "there is nowhere to go but up",
+            "that is not that good sorry",
+            "clean your room",
+            "there is always next month",
+            "lol",
+            "to be honest katsu curry is really nice so fair play",
+        ])
+    elif 0.2 < ratio <= 0.4:
+        words_of_encouragement = random.choice([
+            "it is an ok ratio i think but i think you can do even better next time but well done though",
+            "cool",
+            "not bad",
+            "if you don't like having money then this is a pretty good ratio",
+            "with more dedication i'm sure you can do better next time but well done",
+            "hm"
+        ])
+    elif 0.4 < ratio <= 0.6:
+        words_of_encouragement = random.choice([
+            "it is a good ratio well done",
+            "not bad at all",
+            "it is a nice one",
+            "this is very respectable congratulations",
+            "you are good",
+            "yes",
+        ])
+    elif 0.6 < ratio <= 0.8:
+        words_of_encouragement = random.choice([
+            "that really is great",
+            "gawn yersel",
+            "that is a fantastic ratio, enjoy your money",
+            "this is how you do it everyone",
+            "WOAH!!! good one",
+            "a picture of excellence",
+            "perfect 5/7"
+        ])
+    elif 0.8 < ratio <= 1:
+        words_of_encouragement = random.choice([
+            "a tremendous display of dedication to the art of preparation",
+            "a true hero",
+            "wow that is an inspiring ratio",
+            "well well well !!! look at what we have here, that is really incredible. well done",
+            "i never thought i would see this in my lifetime wow",
+            "now you are just showing off",
+        ])
+    else:
+        raise ValueError(f"Unhandled ratio {ratio}")
+
+    return (
+        f'{stat["name"]} my {random.choice(pet_names)}\n'
+        f'{stat["good_days"]}/{stat["total_days"]}\n'
+        f'{words_of_encouragement}\n'
+        f'you have saved an estimated £{stat["estimated_money_saved"]} this month'
+    )

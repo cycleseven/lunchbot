@@ -54,7 +54,7 @@ def generate_monthly_report(_event, _context):
     winners = monthly_report.get_winners(stats)
 
     logger.info("Generated stats")
-    logger.info(pformat(stats))
+    logger.info([monthly_report.summarise_stat(stat) for stat in stats])
     logger.info("Winners are...")
     logger.info(winners)
 
