@@ -1,7 +1,7 @@
 import datetime
 
 from lunchbot.monthly_report import count_good_days, estimate_money_saved, get_distinct_users, \
-    count_distinct_days, get_monthly_stats, get_winners
+    count_distinct_days, get_monthly_stats, get_winners, summarise_winners
 
 
 def _get_timestamp(year, month, day):
@@ -119,3 +119,8 @@ def test_should_identify_winners():
         {"name": "bob", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
     ]
     assert get_winners(stats) == ["alice", "bob"]
+
+
+def test_should_summarise_winners():
+    assert summarise_winners(["alice"]) == "our winner for the month is\n:tada: alice :tada:"
+    assert summarise_winners(["alice", "bob"]) == "our winners for the month are\n:tada: alice and bob :tada:"

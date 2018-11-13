@@ -146,5 +146,28 @@ def summarise_stat(stat):
         f'{stat["name"]} my {random.choice(pet_names)}\n'
         f'{stat["good_days"]}/{stat["total_days"]}\n'
         f'{words_of_encouragement}\n'
-        f'you have saved an estimated £{stat["estimated_money_saved"]} this month'
+        f'you have saved an estimated £{stat["estimated_money_saved"]} this month\n'
+    )
+
+
+def summarise_winners(winners):
+    if len(winners) == 1:
+        return f"our winner for the month is\n:tada: {winners[0]} :tada:"
+    else:
+        return f"our winners for the month are\n:tada: {' and '.join(winners)} :tada:"
+
+
+def summarise_results(stats):
+    stat_summaries = "\n".join([summarise_stat(stat) for stat in stats])
+    winners = get_winners(stats)
+
+    return (
+        f"hello it is lunchbot here with the monthly summary\n\n"
+        f"well what a month it has been\n\n"
+        f"{stat_summaries}\n"
+        f"that means....... that is correct\n"
+        f"you know it\n"
+        f"{summarise_winners(winners)}\n"
+        f"congratulations and speak to you all next month\n"
+        f"{random.choice(['i will be listening from the shadows', 'i am always watching'])}"
     )
