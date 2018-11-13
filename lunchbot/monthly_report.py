@@ -160,14 +160,26 @@ def summarise_winners(winners):
 def summarise_results(stats):
     stat_summaries = "\n".join([summarise_stat(stat) for stat in stats])
     winners = get_winners(stats)
+    greeting = random.choice([
+        "well what a month it has been",
+        "yes that's right it is that time again",
+        "let's do this",
+        "here we go once more"
+    ])
+    signoff = random.choice([
+        "i will be listening from the shadows",
+        "i am always watching",
+        "bye",
+        "until next time"
+    ])
 
     return (
         f"hello it is lunchbot here with the monthly summary\n\n"
-        f"well what a month it has been\n\n"
+        f"{greeting}\n\n"
         f"{stat_summaries}\n"
         f"that means....... that is correct\n"
         f"you know it\n"
         f"{summarise_winners(winners)}\n"
         f"congratulations and speak to you all next month\n"
-        f"{random.choice(['i will be listening from the shadows', 'i am always watching'])}"
+        f"{signoff}"
     )
