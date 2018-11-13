@@ -66,3 +66,8 @@ def get_monthly_stats(records, users):
         })
 
     return stats
+
+
+def get_winners(stats):
+    max_good_days = max(stats, key=lambda item: item["good_days"])["good_days"]
+    return [stat["name"] for stat in stats if stat["good_days"] == max_good_days]

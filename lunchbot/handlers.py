@@ -51,9 +51,12 @@ def generate_monthly_report(_event, _context):
     records = db.get_monthly_records_for_channel()
     users = monthly_report.fetch_users(records)
     stats = monthly_report.get_monthly_stats(records, users)
+    winners = monthly_report.get_winners(stats)
 
     logger.info("Generated stats")
     logger.info(pformat(stats))
+    logger.info("Winners are...")
+    logger.info(winners)
 
 
 def record_months(_event, _context):

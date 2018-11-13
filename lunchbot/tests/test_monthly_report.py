@@ -1,7 +1,7 @@
 import datetime
 
 from lunchbot.monthly_report import count_good_days, estimate_money_saved, get_distinct_users, \
-    count_distinct_days, get_monthly_stats
+    count_distinct_days, get_monthly_stats, get_winners
 
 
 def _get_timestamp(year, month, day):
@@ -62,7 +62,7 @@ def test_should_count_distinct_days():
     assert count_distinct_days([]) == 0
 
 
-def test_get_monthly_stats():
+def test_should_get_monthly_stats():
     records = [
         # On 1st Jan 2018, Alice brings lunch and Bob doesn't
         {
@@ -105,3 +105,17 @@ def test_get_monthly_stats():
         {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
         {"name": "bob", "good_days": 1, "total_days": 3, "estimated_money_saved": 4},
     ]
+
+
+def test_should_identify_winners():
+    stats = [
+        {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
+        {"name": "bob", "good_days": 1, "total_days": 3, "estimated_money_saved": 4},
+    ]
+    assert get_winners(stats) == ["alice"]
+
+    stats = [
+        {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
+        {"name": "bob", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
+    ]
+    assert get_winners(stats) == ["alice", "bob"]
