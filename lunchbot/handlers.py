@@ -48,19 +48,9 @@ def on_slack_event(event, _context):
 def generate_monthly_report(_event, _context):
     logger.info("Generating monthly report")
 
-    # TODO: channel shouldn't be hardcoded, what if it changes, or another team installs the app?
-    records = db.get_monthly_records_for_channel("C8X98ND0E")
+    records = db.get_monthly_records_for_channel()
     users = monthly_report.fetch_users(records)
-
-    stats = []
-    for user in users:
-        user_records = [record for record in records if record["user_id"] == user["id"]]
-        stats.append({
-            "name": user["name"],
-            "good_days": monthly_report.count_good_days(user_records),
-            "total_days": monthly_report.count_distinct_days(records),
-            "estimated_money_saved": monthly_report.estimate_money_saved(user_records),
-        })
+    stats = monthly_report.get_monthly_stats(records, users)
 
     logger.info("Generated stats")
     logger.info(pformat(stats))

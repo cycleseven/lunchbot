@@ -52,3 +52,17 @@ def count_distinct_days(records):
         datetime.utcfromtimestamp(record["timestamp"]).date()
         for record in records
     ))
+
+
+def get_monthly_stats(records, users):
+    stats = []
+    for user in users:
+        user_records = [record for record in records if record["user_id"] == user["id"]]
+        stats.append({
+            "name": user["name"],
+            "good_days": count_good_days(user_records),
+            "total_days": count_distinct_days(records),
+            "estimated_money_saved": estimate_money_saved(user_records),
+        })
+
+    return stats

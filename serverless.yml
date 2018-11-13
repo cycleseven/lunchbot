@@ -11,6 +11,7 @@ provider:
     DYNAMODB_TABLE_INDEX_BY_MONTH: by_month
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
     SLACK_API_TOKEN: ${file(./secrets.yml):SLACK_API_TOKEN}
+    SLACK_CHANNEL: ${file(./secrets.yml):SLACK_CHANNEL}
   iamRoleStatements:
     - Effect: Allow
       Action:
