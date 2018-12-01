@@ -6,7 +6,7 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.7
   environment:
     DYNAMODB_TABLE_INDEX_BY_MONTH: by_month
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
