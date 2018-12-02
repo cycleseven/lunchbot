@@ -38,7 +38,8 @@ class Lunchbot(object):
             user_id=self.message_event.get_user(),
             channel_id=self.message_event.get_channel(),
             did_bring_lunch=did_bring_lunch,
-            emoji=emoji
+            emoji=emoji,
+            working_month=self.message_event.get_working_month(),
         )
 
     def invalidate_previous_responses_from_today(self):

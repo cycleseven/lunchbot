@@ -46,11 +46,8 @@ def delete_records(records):
             batch.delete_item(Key={"user_id": record["user_id"], "timestamp": record["timestamp"]})
 
 
-def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
+def store_record(ts, user_id, channel_id, did_bring_lunch, emoji, working_month):
     dynamo_table = Dynamo.get_table()
-
-    date = datetime.utcfromtimestamp(int(float(ts))).date()
-    month_key = f"{date.month}/{date.year}"
 
     return dynamo_table.put_item(
         Item={
@@ -61,6 +58,6 @@ def store_record(ts, user_id, channel_id, did_bring_lunch, emoji):
             "channel_id": channel_id,
             "did_bring_lunch": did_bring_lunch,
             "emoji": emoji,
-            "month": month_key
+            "month": working_month
         }
     )
