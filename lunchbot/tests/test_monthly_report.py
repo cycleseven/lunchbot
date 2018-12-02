@@ -1,59 +1,58 @@
-from lunchbot.monthly_report import count_good_days, estimate_money_saved, get_distinct_users, \
-    count_distinct_days, get_monthly_stats, get_winners, summarise_winners
+from lunchbot import monthly_report
 from lunchbot.test_utils import get_timestamp
 
 
 def test_should_count_good_days_for_user():
-    assert count_good_days([
+    assert 3 == monthly_report.count_good_days([
         {"did_bring_lunch": True},
         {"did_bring_lunch": False},
         {"did_bring_lunch": True},
         {"did_bring_lunch": True},
-    ]) == 3
+    ])
 
-    assert count_good_days([{"did_bring_lunch": False}]) == 0
-    assert count_good_days([{"did_bring_lunch": True}]) == 1
-    assert count_good_days([]) == 0
+    assert 0 == monthly_report.count_good_days([{"did_bring_lunch": False}])
+    assert 1 == monthly_report.count_good_days([{"did_bring_lunch": True}])
+    assert 0 == monthly_report.count_good_days([])
 
 
 def test_should_estimate_money_saved():
     """Assume an average saving of £4"""
-    assert estimate_money_saved([
+    assert 12 == monthly_report.estimate_money_saved([
         {"did_bring_lunch": True},
         {"did_bring_lunch": False},
         {"did_bring_lunch": True},
         {"did_bring_lunch": True},
-    ]) == 12
+    ])
 
-    assert estimate_money_saved([{"did_bring_lunch": False}]) == 0
-    assert estimate_money_saved([{"did_bring_lunch": True}]) == 4
-    assert estimate_money_saved([]) == 0
+    assert 0 == monthly_report.estimate_money_saved([{"did_bring_lunch": False}])
+    assert 4 == monthly_report.estimate_money_saved([{"did_bring_lunch": True}])
+    assert 0 == monthly_report.estimate_money_saved([])
 
 
 def test_should_identify_distinct_users():
-    assert get_distinct_users([
+    assert {"AAA", "BBB", "CCC", "DDD"} == monthly_report.get_distinct_users([
         {"user_id": "AAA"},
         {"user_id": "BBB"},
         {"user_id": "CCC"},
         {"user_id": "AAA"},
         {"user_id": "CCC"},
         {"user_id": "DDD"}
-    ]) == {"AAA", "BBB", "CCC", "DDD"}
+    ])
 
-    assert get_distinct_users([]) == set()
+    assert set() == monthly_report.get_distinct_users([])
 
 
 def test_should_count_distinct_days():
-    assert count_distinct_days([
+    assert 3 == monthly_report.count_distinct_days([
         {"timestamp": get_timestamp(2018, 1, 1)},
         {"timestamp": get_timestamp(2018, 1, 1)},
         {"timestamp": get_timestamp(2018, 1, 2)},
         {"timestamp": get_timestamp(2018, 1, 2)},
         {"timestamp": get_timestamp(2018, 1, 2)},
         {"timestamp": get_timestamp(2018, 1, 3)},
-    ]) == 3
+    ])
 
-    assert count_distinct_days([]) == 0
+    assert 0 == monthly_report.count_distinct_days([])
 
 
 def test_should_get_monthly_stats():
@@ -95,10 +94,10 @@ def test_should_get_monthly_stats():
         {"id": "Bob", "name": "bob"},
     ]
 
-    assert get_monthly_stats(records, users) == [
+    assert [
         {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
         {"name": "bob", "good_days": 1, "total_days": 3, "estimated_money_saved": 4},
-    ]
+    ] == monthly_report.get_monthly_stats(records, users)
 
 
 def test_should_identify_winners():
@@ -106,15 +105,15 @@ def test_should_identify_winners():
         {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
         {"name": "bob", "good_days": 1, "total_days": 3, "estimated_money_saved": 4},
     ]
-    assert get_winners(stats) == ["alice"]
+    assert ["alice"] == monthly_report.get_winners(stats)
 
     stats = [
         {"name": "alice", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
         {"name": "bob", "good_days": 2, "total_days": 3, "estimated_money_saved": 8},
     ]
-    assert get_winners(stats) == ["alice", "bob"]
+    assert ["alice", "bob"] == monthly_report.get_winners(stats)
 
 
 def test_should_summarise_winners():
-    assert summarise_winners(["alice"]) == "our winner for the month is\n:tada: alice :tada:"
-    assert summarise_winners(["alice", "bob"]) == "our winners for the month are\n:tada: alice and bob :tada:"
+    assert "our winner for the month is\n:tada: alice :tada:" == monthly_report.summarise_winners(["alice"])
+    assert "our winners for the month are\n:tada: alice and bob :tada:" == monthly_report.summarise_winners(["alice", "bob"])

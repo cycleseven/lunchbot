@@ -12,11 +12,11 @@ def test_should_return_correct_properties_for_new_message_events():
         "ts": "1355517523.000005"
     })
 
-    assert slack_event.get_ts() == "1355517523.000005"
-    assert slack_event.get_ts_as_datetime() == datetime.fromisoformat("2012-12-14T20:38:43")
-    assert slack_event.get_text() == "no"
-    assert slack_event.get_user() == "U2147483697"
-    assert slack_event.get_channel() == "C2147483705"
+    assert "1355517523.000005" == slack_event.get_ts()
+    assert datetime.fromisoformat("2012-12-14T20:38:43") == slack_event.get_ts_as_datetime()
+    assert "no" == slack_event.get_text()
+    assert "U2147483697" == slack_event.get_user()
+    assert "C2147483705" == slack_event.get_channel()
 
 
 def test_should_return_correct_properties_for_edited_message_events():
@@ -41,11 +41,11 @@ def test_should_return_correct_properties_for_edited_message_events():
 
     # Note that the returned ts refers to the *original* message, not the time
     # of the edit!
-    assert slack_event.get_ts() == "1355517523.000005"
-    assert slack_event.get_ts_as_datetime() == datetime.fromisoformat("2012-12-14T20:38:43")
-    assert slack_event.get_text() == "yes"
-    assert slack_event.get_user() == "U2147483697"
-    assert slack_event.get_channel() == "C2147483705"
+    assert "1355517523.000005" == slack_event.get_ts()
+    assert datetime.fromisoformat("2012-12-14T20:38:43") == slack_event.get_ts_as_datetime()
+    assert "yes" == slack_event.get_text()
+    assert "U2147483697" == slack_event.get_user()
+    assert "C2147483705" == slack_event.get_channel()
 
 
 def test_should_recognise_message_events_vs_other_events():
