@@ -54,3 +54,58 @@ def test_should_recognise_message_events_vs_other_events():
 
     message_event = SlackEvent({"type": "message"})
     assert message_event.is_valid_message()
+
+
+def test_should_validate_message_events_correctly():
+    # Message create events are valid
+    assert SlackEvent({
+        "type": "message",
+        "channel": "C2147483705",
+        "user": "U2147483697",
+        "text": "no",
+        "ts": "1355517523.000005"
+    }).is_valid_message()
+
+    # Message edit events are valid
+    assert SlackEvent({
+        "type": "message",
+        "subtype": "message_changed",
+        "hidden": True,
+        "channel": "C2147483705",
+        "ts": "1358878755.000001",
+        "message": {
+            "type": "message",
+            "user": "U2147483697",
+            "text": "yes",
+            "ts": "1355517523.000005",
+            "edited": {
+                "user": "U2147483697",
+                "ts": "1358878755.000001"
+            }
+        }
+    }).is_valid_message()
+
+    # Message delete events aren't handled by the API (yet!)
+    assert not SlackEvent({
+        "type": "message",
+        "subtype": "message_deleted",
+        "hidden": True,
+        "channel": "C2147483705",
+        "ts": "1358878755.000001",
+        "previous_message": {
+            "type": "message",
+            "user": "U2147483697",
+            "text": "blah",
+            "client_msg_id": "abcdef-1234-5678-abcd-asdfasgag",
+            "ts": "1355517523.000005",
+        }
+    }).is_valid_message()
+
+    # Don't react to bot messages. Humans only
+    assert not SlackEvent({
+        "type": "message",
+        "subtype": "bot_message",
+        "channel": "C2147483705",
+        "ts": "1358878755.000001",
+        "text": "hi",
+    }).is_valid_message()

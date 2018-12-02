@@ -16,7 +16,11 @@ class SlackEvent(object):
         self._raw_event = raw_event
 
     def is_valid_message(self):
-        return self._raw_event["type"] == "message"
+        """The API only handles newly created + edited messages."""
+        return (
+            self._raw_event["type"] == "message"
+            and self._get_subtype() in [None, "message_changed"]
+        )
 
     def get_channel(self):
         return self._raw_event["channel"]
@@ -39,10 +43,21 @@ class SlackEvent(object):
         return self._get_message()["user"]
 
     def _get_message(self):
-        if "subtype" in self._raw_event and self._raw_event["subtype"] == "message_changed":
+        if self._get_subtype() == "message_changed":
             return self._raw_event["message"]
         else:
             return self._raw_event
+
+    def _get_subtype(self):
+        """Return the subtype of the message event.
+
+        Possible return values:
+            None               - a real user posted a new message.
+            "message_changed"  - an edit was made to an existing message.
+            "bot_message"      - a bot posted a new message.
+            "message_deleted"  - an existing message was deleted.
+        """
+        return self._raw_event.get("subtype")
 
 
 class LunchbotMessageEvent(SlackEvent):

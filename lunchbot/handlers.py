@@ -33,7 +33,11 @@ def on_slack_event(event, _context):
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "Invalid event, expected a Slack message. https://api.slack.com/events/message"
+                "message": (
+                    "Unhandled event format. "
+                    "Expected a Slack message (https://api.slack.com/events/message). "
+                    "Note that message_delete and bot_message events are intentionally unhandled."
+                )
             })
         }
 
