@@ -56,6 +56,11 @@ def generate_monthly_report(_event, _context):
     records = db.get_monthly_records_for_channel()
     users = monthly_report.fetch_users(records)
     stats = monthly_report.get_monthly_stats(records, users)
+
+    if len(stats) == 0:
+        logger.warn("No stats found for this month.")
+        return
+
     summary = monthly_report.summarise_results(stats)
 
     logger.info("Posting the following summary...")

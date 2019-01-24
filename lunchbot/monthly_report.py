@@ -85,6 +85,10 @@ def get_words_of_encouragement(ratio):
             "there is always next month",
             "lol",
             "to be honest katsu curry is really nice so fair play",
+            "could not be worse",
+            "nah fam",
+            "peak",
+            "problematic",
         ])
     elif 0.2 < ratio <= 0.4:
         return random.choice([
@@ -93,7 +97,10 @@ def get_words_of_encouragement(ratio):
             "not bad",
             "if you don't like having money then this is a pretty good ratio",
             "with more dedication i'm sure you can do better next time but well done",
-            "hm"
+            "hm",
+            "ok",
+            "i am feeling lukewarm about this score",
+            "could be worse"
         ])
     elif 0.4 < ratio <= 0.6:
         return random.choice([
@@ -103,6 +110,7 @@ def get_words_of_encouragement(ratio):
             "this is very respectable congratulations",
             "you are good",
             "yes",
+            "merely hench"
         ])
     elif 0.6 < ratio <= 0.8:
         return random.choice([
@@ -142,19 +150,19 @@ def get_concrete_example_of_the_value_of_saving(estimated_money_saved):
             },
         ])
 
-        percentage_of_goal_achieved = (estimated_money_saved / goal["value"]) * 100
+        percentage_of_goal_achieved = (estimated_money_saved / goal["value_gbp"]) * 100
         return f"{percentage_of_goal_achieved}% of {goal['name']}"
     else:
         # The cheap goals are in this branch
         goal = random.choice([
             {"name": "bananas from a convenience supermarket", "value_gbp": 0.25},
             {"name": "bananas from a big supermarket", "value_gbp": 0.13},
-            {"name": "items from a pound shop", "value_gbp": 1},
+            {"name": "items of your choice from a pound shop", "value_gbp": 1},
             {"name": "plastic coat hangers", "value_gbp": 0.26},
             {"name": "balls of 200 multicolored rubber bands", "value_gbp": 5},
         ])
 
-        number_of_goals_achieved = estimated_money_saved / goal["value"]
+        number_of_goals_achieved = estimated_money_saved / goal["value_gbp"]
         return f"{number_of_goals_achieved} {goal['name']}"
 
 
