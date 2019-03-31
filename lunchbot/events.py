@@ -17,10 +17,10 @@ class SlackEvent(object):
 
     def is_valid_message(self):
         """The API only handles newly created + edited messages."""
-        return (
-            self._raw_event["type"] == "message"
-            and self._get_subtype() in [None, "message_changed"]
-        )
+        return self._raw_event["type"] == "message" and self._get_subtype() in [
+            None,
+            "message_changed",
+        ]
 
     def get_channel(self):
         return self._raw_event["channel"]
@@ -28,7 +28,8 @@ class SlackEvent(object):
     def get_ts(self):
         """Return the ts (Slack timestamp/ID) for the message.
 
-        In the case of messaged_changed events, the original ts of the old message is returned instead of the new ts.
+        In the case of messaged_changed events, the original ts of the old message is returned
+        instead of the new ts.
         """
         return self._get_message()["ts"]
 
@@ -61,16 +62,9 @@ class SlackEvent(object):
 
 
 class LunchbotMessageEvent(SlackEvent):
-    positive_words = [
-        "yes",
-        "aye",
-        "yeah"
-    ]
+    positive_words = ["yes", "aye", "yeah"]
 
-    negative_words = [
-        "no",
-        "cilia"
-    ]
+    negative_words = ["no", "cilia"]
 
     @staticmethod
     def create_from_api_gateway_event(api_gateway_event):
@@ -78,15 +72,21 @@ class LunchbotMessageEvent(SlackEvent):
         return LunchbotMessageEvent(http_body["event"])
 
     def did_user_bring_lunch(self):
-        """Return True if a "yes" is detected in the message, or False for no. Otherwise, return None."""
+        """Return True if a "yes" is detected in the message, or False for no. Otherwise, return
+        None.
+        """
         text = self.get_text()
         tokens = text.lower().split()
 
         if any(appears_in(word, tokens) for word in self.positive_words):
-            logger.info("Affirmative response detected using complex deep neural net algorithm.")
+            logger.info(
+                "Affirmative response detected using complex deep neural net algorithm."
+            )
             return True
         elif any(appears_in(word, tokens) for word in self.negative_words):
-            logger.info("Negative response detected using complex deep neural net algorithm.")
+            logger.info(
+                "Negative response detected using complex deep neural net algorithm."
+            )
             return False
 
     def get_working_month(self):
@@ -94,11 +94,14 @@ class LunchbotMessageEvent(SlackEvent):
 
         The working month runs from one payday to the next (the last Friday of the month).
 
-        Note that the working month might be different from the calendar month. Any working days following the last
-        Friday of the month will actually be assigned to the *following* calendar month.
+        Note that the working month might be different from the calendar month. Any working days
+        following the last Friday of the month will actually be assigned to the *following* calendar
+        month.
         """
         event_date = self.get_ts_as_datetime()
-        last_friday_of_month = get_last_friday_of_month(event_date.year, event_date.month)
+        last_friday_of_month = get_last_friday_of_month(
+            event_date.year, event_date.month
+        )
 
         # Events that happen after payday should be assigned to the following month
         if event_date.day > last_friday_of_month:

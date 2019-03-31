@@ -22,7 +22,9 @@ def test_should_return_true_if_both_lists_are_empty():
 
 
 def test_should_return_false_if_short_list_is_not_subsequence_of_long_list():
-    assert not is_subsequence(['l', 'o', 'l'], ['d', 'i', 'f', 'f', 'e', 'r', 'e', 'n', 't'])
+    assert not is_subsequence(
+        ["l", "o", "l"], ["d", "i", "f", "f", "e", "r", "e", "n", "t"]
+    )
 
 
 def test_should_return_false_if_first_argument_is_actually_the_longer_list():
@@ -30,8 +32,8 @@ def test_should_return_false_if_first_argument_is_actually_the_longer_list():
 
 
 def test_should_return_false_for_partial_match_at_end_of_long_list():
-    assert not is_subsequence(['a', 'b', 'c'], ['1', '2', 'a', 'b'])
+    assert not is_subsequence(["a", "b", "c"], ["1", "2", "a", "b"])
 
 
 def test_should_return_false_for_partial_match_in_middle_of_long_list():
-    assert not is_subsequence(['a', 'b'], ['1', 'a', '3'])
+    assert not is_subsequence(["a", "b"], ["1", "a", "3"])

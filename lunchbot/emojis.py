@@ -60,7 +60,7 @@ emojis = {
         "heavy_multiplication_x",
         "x",
         "negative_squared_cross_mark",
-    ]
+    ],
 }
 
 

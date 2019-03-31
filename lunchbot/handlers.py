@@ -23,22 +23,22 @@ def on_slack_event(event, _context):
     except KeyError:
         return {
             "statusCode": 400,
-            "body": json.dumps({
-                "message": "Malformed event in request body."
-            })
+            "body": json.dumps({"message": "Malformed event in request body."}),
         }
 
     # Validate
     if not lunchbot_message.is_valid_message():
         return {
             "statusCode": 400,
-            "body": json.dumps({
-                "message": (
-                    "Unhandled event format. "
-                    "Expected a Slack message (https://api.slack.com/events/message). "
-                    "Note that message_delete and bot_message events are intentionally unhandled."
-                )
-            })
+            "body": json.dumps(
+                {
+                    "message": (
+                        "Unhandled event format. "
+                        "Expected a Slack message (https://api.slack.com/events/message). "
+                        "Note that message_delete and bot_message events are intentionally unhandled."
+                    )
+                }
+            ),
         }
 
     lunchbot = Lunchbot(lunchbot_message)
@@ -46,7 +46,7 @@ def on_slack_event(event, _context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps({"message": "Successfully processed Slack event."})
+        "body": json.dumps({"message": "Successfully processed Slack event."}),
     }
 
 
@@ -67,7 +67,9 @@ def generate_monthly_report(_event, _context):
     logger.info(summary)
 
     slack_client = Slack.get_client()
-    slack_client.api_call("chat.postMessage", channel=os.environ["SLACK_CHANNEL"], text=summary)
+    slack_client.api_call(
+        "chat.postMessage", channel=os.environ["SLACK_CHANNEL"], text=summary
+    )
 
 
 def record_months(_event, _context):
@@ -84,12 +86,6 @@ def record_months(_event, _context):
             month_key = f"{date.month}/{date.year}"
 
             logger.info("Writing...")
-            logger.info(pformat({
-                **record,
-                "month": month_key
-            }))
+            logger.info(pformat({**record, "month": month_key}))
 
-            batch.put_item(Item={
-                **record,
-                "month": month_key
-            })
+            batch.put_item(Item={**record, "month": month_key})

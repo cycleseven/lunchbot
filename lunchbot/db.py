@@ -15,7 +15,8 @@ def get_todays_records_for_user(user_id):
 
     return table.query(
         ConsistentRead=True,
-        KeyConditionExpression=Key("user_id").eq(user_id) & Key("timestamp").gte(Decimal(start_of_today))
+        KeyConditionExpression=Key("user_id").eq(user_id)
+        & Key("timestamp").gte(Decimal(start_of_today)),
     )["Items"]
 
 
@@ -26,7 +27,7 @@ def get_monthly_records():
 
     return table.query(
         IndexName=os.environ["DYNAMODB_TABLE_INDEX_BY_MONTH"],
-        KeyConditionExpression=Key("month").eq(month_key)
+        KeyConditionExpression=Key("month").eq(month_key),
     )["Items"]
 
 
@@ -36,14 +37,18 @@ def get_monthly_records_for_channel():
     # this isn't a big deal
     channel_id = os.environ["SLACK_CHANNEL"]
     all_monthly_records = get_monthly_records()
-    return [record for record in all_monthly_records if record["channel_id"] == channel_id]
+    return [
+        record for record in all_monthly_records if record["channel_id"] == channel_id
+    ]
 
 
 def delete_records(records):
     dynamo_table = Dynamo.get_table()
     with dynamo_table.batch_writer() as batch:
         for record in records:
-            batch.delete_item(Key={"user_id": record["user_id"], "timestamp": record["timestamp"]})
+            batch.delete_item(
+                Key={"user_id": record["user_id"], "timestamp": record["timestamp"]}
+            )
 
 
 def store_record(ts, user_id, channel_id, did_bring_lunch, emoji, working_month):
@@ -58,6 +63,6 @@ def store_record(ts, user_id, channel_id, did_bring_lunch, emoji, working_month)
             "channel_id": channel_id,
             "did_bring_lunch": did_bring_lunch,
             "emoji": emoji,
-            "month": working_month
+            "month": working_month,
         }
     )

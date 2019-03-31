@@ -27,7 +27,7 @@ class Lunchbot(object):
             "reactions.add",
             channel=self.message_event.get_channel(),
             name=emoji,
-            timestamp=self.message_event.get_ts()
+            timestamp=self.message_event.get_ts(),
         )
 
         logger.debug("Called reactions.add in Slack API")
@@ -44,7 +44,9 @@ class Lunchbot(object):
 
     def invalidate_previous_responses_from_today(self):
         """Query for existing responses and delete them."""
-        todays_records_for_user = db.get_todays_records_for_user(self.message_event.get_user())
+        todays_records_for_user = db.get_todays_records_for_user(
+            self.message_event.get_user()
+        )
 
         if len(todays_records_for_user) == 0:
             return
@@ -55,7 +57,7 @@ class Lunchbot(object):
                 "reactions.remove",
                 channel=self.message_event.get_channel(),
                 name=record["emoji"],
-                timestamp=record["slack_ts"]
+                timestamp=record["slack_ts"],
             )
 
             logger.debug("Called reactions.remove in Slack API")
