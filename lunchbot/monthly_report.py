@@ -9,6 +9,8 @@ from lunchbot.services import Slack
 logger = logging.getLogger(__name__)
 
 
+
+
 def count_good_days(records):
     """A "good" day is a day when the user brought lunch"""
     return sum(1 for record in records if record["did_bring_lunch"])
