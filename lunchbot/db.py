@@ -42,6 +42,8 @@ def get_monthly_records_for_channel():
     ]
 
 
+
+
 def delete_records(records):
     dynamo_table = Dynamo.get_table()
     with dynamo_table.batch_writer() as batch:
