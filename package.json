@@ -11,6 +11,9 @@
     }
   },
   "lint-staged": {
-    "*.py": "black"
+    "*.py": [
+      "black",
+      "git add"
+    ]
   }
 }
