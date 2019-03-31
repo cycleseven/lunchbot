@@ -13,6 +13,7 @@
   "lint-staged": {
     "*.py": [
       "black",
+      "flake8",
       "git add"
     ]
   }
