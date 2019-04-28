@@ -4,7 +4,7 @@ Lunchbot is a Slack bot to help you keep track of your lunchtime spending habits
  
 ## How does it work?
  
-The bot listens to all messages in the channels it belongs to. (TODO: the "all channels it belongs to" part is not actually true yet, but it's planned.)
+The bot listens to all messages in the channels it belongs to.
 
 Each work day, everybody who wants to take part in the game reports whether they brought food from home that day.
 
