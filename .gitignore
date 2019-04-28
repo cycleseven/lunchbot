@@ -29,5 +29,5 @@ __pycache__
 .idea
 
 # Secrets
-secrets.yml
+env.yml
 db_backups

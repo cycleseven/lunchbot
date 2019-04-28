@@ -86,6 +86,6 @@ From here you can follow Slack's instructions to complete the challenge. The end
 lunchbot.example.com/events
 ```
 
-Add the file `secrets.yml` based on the template `secrets.example.yml`. These secrets configure the app's connection to a Slack workspace.
+Add the file `env.yml` based on the template `env.example.yml`. These secrets configure the app's connection to a Slack workspace.
 
-(TODO: add further info on how to get a Slack API token. Also unclear when to actually create the secrets file if custom domain is going to be configurable)
+(TODO: add further info on how to get a Slack API token. Also unclear when to actually create the config file if custom domain is going to be configurable)

@@ -115,3 +115,15 @@ class LunchbotMessageEvent(SlackEvent):
                 return f"{next_month}/{event_date.year}"
 
         return f"{event_date.month}/{event_date.year}"
+
+
+class ScheduledTaskOptions(object):
+    @staticmethod
+    def create_from_cloudwatch_event(cloudwatch_event):
+        return ScheduledTaskOptions(cloudwatch_event)
+
+    def __init__(self, cloudwatch_event):
+        self._cloudwatch_event = cloudwatch_event
+
+    def is_dry_run(self):
+        return self._cloudwatch_event.get("dry_run") != "false"

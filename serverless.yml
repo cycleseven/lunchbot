@@ -10,8 +10,8 @@ provider:
   environment:
     DYNAMODB_TABLE_INDEX_BY_MONTH: by_month
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
-    SLACK_API_TOKEN: ${file(./secrets.yml):SLACK_API_TOKEN}
-    SLACK_CHANNEL: ${file(./secrets.yml):SLACK_CHANNEL}
+    LOG_LEVEL: ${self:custom.environment.LOG_LEVEL}
+    SLACK_API_TOKEN: ${self:custom.environment.SLACK_API_TOKEN}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -46,7 +46,10 @@ functions:
   generate_monthly_report:
     handler: lunchbot.handlers.generate_monthly_report
     events:
-      - schedule: cron(0 16 ? * 6L *)
+      - schedule:
+          rate: cron(0 16 ? * 6L *)
+          input:
+            dry_run: false
   record_months:
     handler: lunchbot.handlers.record_months
 
@@ -94,7 +97,9 @@ resources:
               WriteCapacityUnits: 1
 
 custom:
+  environment: ${file(./env.yml):${opt:stage, self:provider.stage}}
   customDomain:
-    domainName: lunchbot.cy7.io
-    certificateName: cy7.io
-    createRoute53Record: true
+    domainName: ${self:custom.environment.CUSTOM_DOMAIN_NAME, "false"}
+    enabled: ${self:custom.environment.CUSTOM_DOMAIN_ENABLED, "false"}
+    certificateName: ${self:custom.environment.CUSTOM_DOMAIN_CERTIFICATE_NAME, "false"}
+    createRoute53Record: ${self:custom.environment.CREATE_ROUTE_53_RECORD_FOR_CUSTOM_DOMAIN, "false"}

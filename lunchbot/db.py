@@ -31,11 +31,10 @@ def get_monthly_records():
     )["Items"]
 
 
-def get_monthly_records_for_channel():
+def get_monthly_records_for_channel(channel_id):
     # It's probably possible to be smarter about the DB structure to avoid looping over records,
     # but the max no. records expected per month is maybe about 25 per person, so realistically,
     # this isn't a big deal
-    channel_id = os.environ["SLACK_CHANNEL"]
     all_monthly_records = get_monthly_records()
     return [
         record for record in all_monthly_records if record["channel_id"] == channel_id

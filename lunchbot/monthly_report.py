@@ -6,7 +6,7 @@ from lunchbot import logging
 from lunchbot.services import Slack
 
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 
 def count_good_days(records):

@@ -4,7 +4,7 @@ from lunchbot import emojis, db, logging
 from lunchbot.services import Slack
 
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 
 class Lunchbot(object):
