@@ -126,4 +126,4 @@ class ScheduledTaskOptions(object):
         self._cloudwatch_event = cloudwatch_event
 
     def is_dry_run(self):
-        return self._cloudwatch_event.get("dry_run") != "false"
+        return self._cloudwatch_event.get("dry_run") is not False
