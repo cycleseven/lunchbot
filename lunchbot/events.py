@@ -62,9 +62,9 @@ class SlackEvent(object):
 
 
 class LunchbotMessageEvent(SlackEvent):
-    positive_words = ["yes", "aye", "yeah"]
+    positive_words = ["yes", "aye", "yeah", "yep"]
 
-    negative_words = ["no", "cilia"]
+    negative_words = ["no", "nope", "not"]
 
     @staticmethod
     def create_from_api_gateway_event(api_gateway_event):
